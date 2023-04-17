@@ -14,18 +14,20 @@
             <span class="font-semibold text-xl tracking-tight">YT Viewer</span>
         </div>
         <a href="https://www.bbc.com/japanese">
-        <button class="bg-green-300 px-4 py-2 rounded text-gray-100">Download</button>
         <button class="bg-red-500 px-4 py-2 rounded text-gray-100 ">Escape</button>
         </a>
     </nav>
     <div class="grid gap-6 mb-6 mx-4 my-4">
+        <div>
+            <button class="bg-green-300 px-4 py-2 rounded text-gray-100"> Download </button>
+        </div>
         <div>
             <label for="video_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">URL</label>
             <input type="text" id="video_id"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="XXXXXXX" required>
         </div>
-        <iframe width="100%" height="600" src="https://www.youtube-nocookie.com/embed/59IcdfZlbPQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe width="100%" height="750" src="https://www.youtube-nocookie.com/embed/59IcdfZlbPQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
     <script>
         // when video_id is changed, change iframe src
