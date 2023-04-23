@@ -1,0 +1,72 @@
+<html lang="ja">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.11/mvp.css">
+    <title>Data Maker</title>
+</head>
+
+<body>
+    <main>
+        <h1>Data Maker v1</h1>
+        <form action="data.html" method="get">
+            <h2>Data Gen</h2>
+            <label for="count">Count</label>
+            <input type="number" name="count" id="count" value="50" required />
+            <input type="radio" name="type" value="h" checked> Horizontal<br>
+            <input type="radio" name="type" value="v" disabled> Vertical<br>
+            <button type="button" name="go" onclick="generate()">Generate</button>
+            <br>
+            <h3 id="ave">Average:</h3>
+            <table id="table">
+                <tr>
+                    <th>No.</th>
+                    <th>left</th>
+                    <th>right</th>
+                    <th>diff</th>
+                </tr>
+            </table>
+
+        </form>
+    </main>
+    <script>// 既存のテーブル要素を取得
+    function generate() {
+        const table = document.querySelector("table");
+        const count = document.querySelector("input[name=count]").value;
+        // 既存のテーブルの行を削除
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+        // 乱数を生成し、計算を繰り返す
+        diffs = [];
+        for (let i = 0; i < count; i++) {
+            const left = Math.random() * 94.0; // 0~94.0の乱数
+            const diff = Math.random() * 1.3 + 54.8; // 54.8~56.1の乱数
+            const right = left + diff; // rightを計算
+
+            // テーブルに行を追加
+            const row = table.insertRow();
+            const noCell = row.insertCell();
+            noCell.innerHTML = i + 1;
+            const leftCell = row.insertCell();
+            leftCell.innerHTML = left.toFixed(1);
+            const rightCell = row.insertCell();
+            rightCell.innerHTML = right.toFixed(1);
+            const diffCell = row.insertCell();
+            diffCell.innerHTML = diff.toFixed(1);
+
+            diffs.push(diff);
+        }
+        const ave = diffs.reduce((a, x) => a + x) / diffs.length;
+        document.querySelector("#ave").innerHTML = "Average: " + ave.toFixed(1);
+        // テーブルをページに追加
+        document.body.main.form.appendChild(table);
+
+        // 平均値を表示
+
+    }
+    </script>
+
+</body>
+
+</html>
