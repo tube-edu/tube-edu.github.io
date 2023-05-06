@@ -1,0 +1,7 @@
+<h1 id="magic">数を入れろ</h1>
+<input type="number" value="50" id="jiro"/>
+<script>
+  document.getElementById("jiro").onchange = function() {
+  num = document.getElementById("jiro").value;
+  document.getElementById("magic").innerHTML = "あなたがいれた数は"+num+"ですね！";
+  };
