@@ -1,8 +1,17 @@
-<h1 id="magic">数を入れろ</h1>
-<input type="number" value="50" id="jiro"/>
-<script>
-  document.getElementById("jiro").onchange = function() {
-  num = document.getElementById("jiro").value;
-  document.getElementById("magic").innerHTML = "あなたがいれた数は"+num+"ですね！";
-  };
-</script>
+<html><head>
+    <meta charset="UTF-8">
+    <title>数を入れろ</title>
+  </head>
+  <body>
+    <h1 id="magic">あなたがいれた数は34ですね！</h1>
+    <input type="number" id="jiro" onchange="magic()">
+    <script>
+      function magic() {
+        var num = document.getElementById("jiro").value;
+        document.getElementById("magic").innerHTML = "あなたが入力した数は " + num + " ですね！";
+      }
+    </script>
+  
+
+
+</body></html>
