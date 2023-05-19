@@ -30,24 +30,8 @@
     <button class="bg-emerald-300 rounded w-full px-4 py-2 my-4 mx-4 mr-8">Download</button>
     <script>
         // when video_id is changed, change ifra
-        function getVideoIdFromUrl(url) {
-  // URLからビデオIDを抽出する正規表現パターン
-  var pattern = /youtu\.be\/([^#\&\?]{11})/;
-  var match = url.match(pattern);
-  
-  if (match && match[1]) {
-    // マッチしたビデオIDを返す
-    return match[1];
-  } else {
-    // youtu.beが含まれていない場合、空文字列を返す
-    return "";
-  }
-}
         document.getElementById("video_id").addEventListener("change", function() {
-            var video_id = this.value.match(/(?:\?v=|\/embed\/)([\w-]+)/)[1];
-            if ("youtu.be") in this.value {
-                video_id = getVideoIdFromUrl(this.value)
-           
+            var video_id = this.value.match(/(?:\?v=|\/embed\/)([\w-]+)/)[1];           
             
             document.getElementsByTagName("iframe")[0].src = "https://www.youtube-nocookie.com/embed/" + video_id;
         });
