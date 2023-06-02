@@ -38,6 +38,7 @@
 
             var mix = Hcount + Ocount;
             var mixFactor = 60 / mix;
+            mix = Math.round(mix * mixFactor);
             var H2 = Math.round(Hcount * mixFactor);
             var O2 = Math.round(Ocount * mixFactor);
             var leftValue = Math.round(left * mixFactor);
