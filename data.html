@@ -50,10 +50,10 @@
             var O2Cell = row.insertCell(2);
             var leftCell = row.insertCell(3);
 
-            mixCell.innerHTML = mix/10;
-            H2Cell.innerHTML = H2/10;
-            O2Cell.innerHTML = O2/10;
-            leftCell.innerHTML = leftValue/10;
+            mixCell.innerHTML = (mix/10).toFixed(1);
+            H2Cell.innerHTML = (H2/10).toFixed(1);
+            O2Cell.innerHTML = (O2/10).toFixed(1);
+            leftCell.innerHTML = (leftValue/10).toFixed(1);
         }
     </script>
 </body>
