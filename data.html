@@ -36,7 +36,7 @@
             var Ocount = parseInt(document.getElementById("Ocount").value);
             var left = parseInt(document.getElementById("left").value);
 
-            var mix = Math.round((Ocount / (Hcount + Ocount + left)) * 100);
+            var mix = Hcount + Ocount;
             var mixFactor = 60 / mix;
             var H2 = Math.round(Hcount * mixFactor);
             var O2 = Math.round(Ocount * mixFactor);
