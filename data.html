@@ -42,6 +42,10 @@
             var H2 = Math.round(Hcount * mixFactor);
             var O2 = Math.round(Ocount * mixFactor);
             var leftValue = Math.round(left * mixFactor);
+            
+            while (table.rows.length > 1){
+table.deleteRow(1);
+    }
 
             var table = document.getElementById("table");
             var row = table.insertRow(-1);
