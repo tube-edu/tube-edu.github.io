@@ -9,173 +9,52 @@
 
 <body>
     <main>
-        <h1>Data Maker v1</h1>
+        <h1>Data Maker v2</h1>
         <form action="data.html" method="get">
             <h2>Data Gen</h2>
-            <label for="count">Count</label>
-            <input type="number" name="count" id="count" value="50" required />
-            <input type="radio" name="type" value="h" checked> Horizontal<br>
-            <input type="radio" name="type" value="v"> Vertical<br>
-            <input type="checkbox" name="sort" value="sort"> Sort by left<br>
+            <label for="Hcount">H2</label>
+            <input type="number" name="Hcount" id="Hcount" value="" required />
+            <label for="Ocount">O2</label>
+            <input type="number" name="Ocount" id="Ocount" value="" required />
+            <label for="left">left</label>
+            <input type="number" name="left" id="left" value="" required />
             <button type="button" name="go" onclick="generate()">Generate</button>
-            <h3 id="type">Type:</h3>
-            <h3 id="ave">Average:</h3>
             <table id="table">
                 <tr>
-                    <th>No.</th>
+                    <th>Mix</th>
+                    <th>H2</th>
+                    <th>O2</th>
                     <th>left</th>
-                    <th>right</th>
-                    <th>diff</th>
                 </tr>
             </table>
-
         </form>
     </main>
-    <script>// 既存のテーブル要素を取得
-    function generate() {
-        const table = document.querySelector("table");
-        const count = document.querySelector("input[name=count]").value;
-        const type = document.querySelector("input[name=type]:checked").value;
-        // check if sort has been checked
-        try {
-            var sort = document.querySelector("input[name=sort]:checked").value;
+
+    <script>
+        function generate() {
+            var Hcount = parseInt(document.getElementById("Hcount").value);
+            var Ocount = parseInt(document.getElementById("Ocount").value);
+            var left = parseInt(document.getElementById("left").value);
+
+            var mix = Math.round((Ocount / (Hcount + Ocount + left)) * 100);
+            var mixFactor = 60 / mix;
+            var H2 = Math.round(Hcount * mixFactor);
+            var O2 = Math.round(Ocount * mixFactor);
+            var leftValue = Math.round(left * mixFactor);
+
+            var table = document.getElementById("table");
+            var row = table.insertRow(-1);
+            var mixCell = row.insertCell(0);
+            var H2Cell = row.insertCell(1);
+            var O2Cell = row.insertCell(2);
+            var leftCell = row.insertCell(3);
+
+            mixCell.innerHTML = mix;
+            H2Cell.innerHTML = H2;
+            O2Cell.innerHTML = O2;
+            leftCell.innerHTML = leftValue;
         }
-        catch(e){
-            var sort = "unsort";
-        }
-        // 既存のテーブルの行を削除
-        console.log(sort)
-        while (table.rows.length > 1) {
-            table.deleteRow(1);
-        }
-        // 乱数を生成し、計算を繰り返す
-        if (type == "h"){
-            if (sort == "sort"){
-                const rows = [];
-                for (let i = 0; i < count; i++) {
-                const left = Math.random() * 94.0; // 0~94.0の乱数
-                const diff = Math.random() * 1.3 + 54.8; // 54.8~56.1の乱数
-                const right = left + diff; // rightを計算
-
-                // 行を配列に追加
-                rows.push([left, right, diff]);
-                }
-
-                // leftでソート
-                rows.sort((a, b) => a[0] - b[0]);
-
-                // テーブルに行を追加
-                for (let i = 0; i < rows.length; i++) {
-                const row = table.insertRow();
-                const noCell = row.insertCell();
-                noCell.innerHTML = i + 1;
-                const leftCell = row.insertCell();
-                leftCell.innerHTML = rows[i][0].toFixed(1);
-                const rightCell = row.insertCell();
-                rightCell.innerHTML = rows[i][1].toFixed(1);
-                const diffCell = row.insertCell();
-                diffCell.innerHTML = rows[i][2].toFixed(1);
-                }
-                const ave = rows.reduce((a, x) => a + x[2], 0) / rows.length;
-                document.querySelector("#type").innerHTML = "Type: " + type;
-                document.querySelector("#ave").innerHTML = "Average: " + ave.toFixed(1);
-
-                // テーブルをページに追加
-                document.body.main.form.appendChild(table);
-                return;
-            }
-                diffs = [];
-                for (let i = 0; i < count; i++) {
-                    const left = Math.random() * 94.0; // 0~94.0の乱数
-                    const diff = Math.random() * 1.3 + 54.8; // 54.8~56.1の乱数
-                    const right = left + diff; // rightを計算
-
-                    // テーブルに行を追加
-                    const row = table.insertRow();
-                    const noCell = row.insertCell();
-                    noCell.innerHTML = i + 1;
-                    const leftCell = row.insertCell();
-                    leftCell.innerHTML = left.toFixed(1);
-                    const rightCell = row.insertCell();
-                    rightCell.innerHTML = right.toFixed(1);
-                    const diffCell = row.insertCell();
-                    diffCell.innerHTML = diff.toFixed(1);
-
-                    diffs.push(diff);
-                }
-                const ave = diffs.reduce((a, x) => a + x) / diffs.length;
-                document.querySelector("#type").innerHTML = "Type: " + type;
-                document.querySelector("#ave").innerHTML = "Average: " + ave.toFixed(1);
-                // テーブルをページに追加
-                document.body.main.form.appendChild(table);
-        }
-        else if (type == "v"){
-            if (sort == "sort"){
-                const rows = [];
-                for (let i = 0; i < count; i++) {
-                const left = Math.random() * 115.0; // 0~115.0の乱数
-                const diff = Math.random() * 1.0 + 33.6; // 33.6~34.6の乱数
-                const right = left + diff; // rightを計算
-
-                // 行を配列に追加
-                rows.push([left, right, diff]);
-                }
-
-                // leftでソート
-                rows.sort((a, b) => a[0] - b[0]);
-
-                // テーブルに行を追加
-                for (let i = 0; i < rows.length; i++) {
-                const row = table.insertRow();
-                const noCell = row.insertCell();
-                noCell.innerHTML = i + 1;
-                const leftCell = row.insertCell();
-                leftCell.innerHTML = rows[i][0].toFixed(1);
-                const rightCell = row.insertCell();
-                rightCell.innerHTML = rows[i][1].toFixed(1);
-                const diffCell = row.insertCell();
-                diffCell.innerHTML = rows[i][2].toFixed(1);
-                }
-                // average
-                const ave = rows.reduce((a, x) => a + x[2], 0) / rows.length;
-                document.querySelector("#type").innerHTML = "Type: " + type;
-                document.querySelector("#ave").innerHTML = "Average: " + ave.toFixed(1);
-                // テーブルをページに追加
-                document.body.main.form.appendChild(table);
-                return;
-            }
-            diffs = [];
-            for (let i = 0; i < count; i++) {
-                const left = Math.random() * 115.0; // 0~115.0の乱数
-                const diff = Math.random() * 1.0 + 33.6; // 33.6~34.6の乱数
-                const right = left + diff; // rightを計算
-
-                // テーブルに行を追加
-                const row = table.insertRow();
-                const noCell = row.insertCell();
-                noCell.innerHTML = i + 1;
-                const leftCell = row.insertCell();
-                leftCell.innerHTML = left.toFixed(1);
-                const rightCell = row.insertCell();
-                rightCell.innerHTML = right.toFixed(1);
-                const diffCell = row.insertCell();
-                diffCell.innerHTML = diff.toFixed(1);
-
-                diffs.push(diff);
-            }
-            const ave = diffs.reduce((a, x) => a + x) / diffs.length;
-            document.querySelector("#type").innerHTML = "Type: " + type;
-            document.querySelector("#ave").innerHTML = "Average: " + ave.toFixed(1);
-            // テーブルをページに追加
-            document.body.main.form.appendChild(table);
-        }
-
-        // 平均値を表示
-
-    }
     </script>
-
 </body>
-
 
 </html>
