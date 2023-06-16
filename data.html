@@ -12,6 +12,7 @@
         <h1>Data Maker v3</h1>
         <form action="data.html" method="get">
             <h2>Data Gen</h2>
+            <h3>時間は　7 → 70 のように、10倍して入力！</h3>
             <label for="A">A</label>
             <input type="number" name="A" id="A" value="" required />
             <label for="B">B</label>
@@ -83,7 +84,7 @@ table.deleteRow(1);
             Erow.innerHTML = Esum/100
             Sumrow.innerHTML = sum
             levrow.innerHTML = level
-            calrow.innerHTML = cal
+            calrow.innerHTML = cal.slice(-5)
             
         }
     </script>
