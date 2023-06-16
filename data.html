@@ -55,7 +55,7 @@
             var Bsum = B*15
             var Csum = C*25
             var Dsum = D*45
-            var Esum = E*7
+            var Esum = E*70
             var sum = (Asum + Bsum + Csum + Dsum + Esum)/100
             var level = sum / 24
             var cal = (sum*105*G)/100
@@ -76,11 +76,11 @@ table.deleteRow(1);
             var levrow = row.insertCell(6);
             var calrow = row.insertCell(7);
 
-            Arow.innerHTML = Asum/10
-            Brow.innerHTML = Bsum/10
-            Crow.innerHTML = Csum/10
-            Drow.innerHTML = Dsum/10
-            Erow.innerHTML = Esum/10
+            Arow.innerHTML = Asum/100
+            Brow.innerHTML = Bsum/100
+            Crow.innerHTML = Csum/100
+            Drow.innerHTML = Dsum/100
+            Erow.innerHTML = Esum/100
             Sumrow.innerHTML = sum
             levrow.innerHTML = level
             calrow.innerHTML = cal
