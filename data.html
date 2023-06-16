@@ -9,23 +9,32 @@
 
 <body>
     <main>
-        <h1>Data Maker v2</h1>
+        <h1>Data Maker v3</h1>
         <form action="data.html" method="get">
             <h2>Data Gen</h2>
-            <h3>6.0 なら 60 といった感じで入力してください！！！</h3>
-            <label for="Hcount">H2</label>
-            <input type="number" name="Hcount" id="Hcount" value="" required />
-            <label for="Ocount">O2</label>
-            <input type="number" name="Ocount" id="Ocount" value="" required />
-            <label for="left">left</label>
-            <input type="number" name="left" id="left" value="" required />
+            <label for="A">A</label>
+            <input type="number" name="A" id="A" value="" required />
+            <label for="B">B</label>
+            <input type="number" name="B" id="B" value="" required />
+            <label for="C">C</label>
+            <input type="number" name="C" id="C" value="" required />
+            <label for="D">D</label>
+            <input type="number" name="D" id="D" value="" required />
+            <label for="E">E</label>
+            <input type="number" name="E" id="E" value="" required />
+            <label for="G">kg</label>
+            <input type="number" name="G" id="G" value="" required />
             <button type="button" name="go" onclick="generate()">Generate</button>
             <table id="table">
                 <tr>
-                    <th>Mix</th>
-                    <th>H2</th>
-                    <th>O2</th>
-                    <th>left</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>E</th>
+                    <th>Sum</th>
+                    <th>Level</th>
+                    <th>Cal</th>
                 </tr>
             </table>
         </form>
@@ -33,16 +42,23 @@
 
     <script>
         function generate() {
-            var Hcount = parseInt(document.getElementById("Hcount").value);
-            var Ocount = parseInt(document.getElementById("Ocount").value);
-            var left = parseInt(document.getElementById("left").value);
+            var A = parseInt(document.getElementById("A").value);
+            var B = parseInt(document.getElementById("B").value);
+            var C = parseInt(document.getElementById("C").value);
+            var D = parseInt(document.getElementById("D").value);
+            var E = parseInt(document.getElementById("E").value);
+            var G = parseInt(document.getElementById("G").value);
+            
+            
 
-            var mix = Hcount + Ocount;
-            var mixFactor = 60 / mix;
-            mix = Math.round(mix * mixFactor);
-            var H2 = Math.round(Hcount * mixFactor);
-            var O2 = Math.round(Ocount * mixFactor);
-            var leftValue = Math.round(left * mixFactor);
+            var Asum = A*9
+            var Bsum = B*15
+            var Csum = C*25
+            var Dsum = D*45
+            var Esum = E*7
+            var sum = (Asum + Bsum + Csum + Dsum + Esum)/100
+            var level = sum / 24
+            var cal = (sum*105*G)/100
             
             
 
@@ -51,15 +67,24 @@
 table.deleteRow(1);
     }
             var row = table.insertRow(-1);
-            var mixCell = row.insertCell(0);
-            var H2Cell = row.insertCell(1);
-            var O2Cell = row.insertCell(2);
-            var leftCell = row.insertCell(3);
+            var Arow = row.insertCell(0);
+            var Brow = row.insertCell(1);
+            var Crow = row.insertCell(2);
+            var Drow = row.insertCell(3);
+            var Erow = row.insertCell(4);
+            var Sumrow = row.insertCell(5);
+            var levrow = row.insertCell(6);
+            var calrow = row.insertCell(7);
 
-            mixCell.innerHTML = (mix/10).toFixed(1);
-            H2Cell.innerHTML = (H2/10).toFixed(1);
-            O2Cell.innerHTML = (O2/10).toFixed(1);
-            leftCell.innerHTML = (leftValue/10).toFixed(1);
+            Arow.innerHTML = Asum/10
+            Brow.innerHTML = Bsum/10
+            Crow.innerHTML = Csum/10
+            Drow.innerHTML = Dsum/10
+            Erow.innerHTML = Esum/10
+            Sumrow.innerHTML = sum
+            levrow.innerHTML = level
+            calrow.innerHTML = cal
+            
         }
     </script>
 </body>
