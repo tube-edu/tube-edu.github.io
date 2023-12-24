@@ -10,8 +10,9 @@ import "@mantine/nprogress/styles.css";
 import "@mantine/spotlight/styles.css";
 import "@mantine/tiptap/styles.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
+import { Analytics } from "@vercel/analytics/react";
 import type { AppProps } from "next/app";
+
 import { createTheme, MantineProvider } from "@mantine/core";
 
 const theme = createTheme({
@@ -23,6 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <MantineProvider theme={theme}>
       <Component {...pageProps} />
       <SpeedInsights />
+      <Analytics />
     </MantineProvider>
   );
 }

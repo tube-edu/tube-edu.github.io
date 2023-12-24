@@ -28,6 +28,7 @@
     "@types/usetube": "^2.1.2",
     "@types/youtube-player": "^5.5.11",
     "@types/yt-player": "^3.5.4",
+    "@vercel/analytics": "^1.1.1",
     "@vercel/speed-insights": "^1.0.2",
     "dashjs": "^4.7.3",
     "dayjs": "^1.11.10",
