@@ -30,6 +30,7 @@
     // このオプションを削除すると
     // .jsファイルの隣に.d.tsファイルが置かれます
     "outDir": "dist",
+    "noEmit": true
   },
   "include": [
     "next-env.d.ts",

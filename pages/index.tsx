@@ -110,7 +110,6 @@ export default function Home() {
           <Card
             shadow="md"
             radius={"md"}
-            p={"lg"}
             h={"350px"}
             key={video.id}
             onClick={() => (location.href = `/video/${video.id}`)}
@@ -124,29 +123,23 @@ export default function Home() {
                 alt="Norway"
               />
             </Card.Section>
-            <Grid mt={"sm"}>
-              <Grid.Col span={2}>
-                <Avatar
-                  src={video.author.thumbnails[0].url}
-                  radius="xl"
-                  size="md"
-                />
-              </Grid.Col>
-              <Grid.Col span={10}>
-                <Text
-                  size="lg"
-                  h={"lg"}
-                  style={{ overflow: "ellipsis", whiteSpace: "nowrap" }}
-                >
-                  {video.title.text}
-                </Text>
-                <Text size="sm" color="gray" mt={"xs"}>
-                  {video.author.name}
-                  <br />
-                  {video.published.text}・{video.short_view_count.text}
-                </Text>
-              </Grid.Col>
-            </Grid>
+
+            <Text size="lg" lineClamp={1} mt={"xs"}>
+              {video.title.text}
+            </Text>
+            <Group>
+              <Avatar
+                src={video.author.thumbnails[0].url}
+                radius="xl"
+                size="md"
+              />
+              <Text size="sm" color="gray">
+                {video.author.name.slice(0, 30)}
+                {video.author.name.length > 30 && "..."}
+                <br />
+                {video.published.text}・{video.short_view_count.text}
+              </Text>
+            </Group>
           </Card>
         ))}
       </SimpleGrid>
