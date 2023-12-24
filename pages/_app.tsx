@@ -9,6 +9,7 @@ import "@mantine/notifications/styles.css";
 import "@mantine/nprogress/styles.css";
 import "@mantine/spotlight/styles.css";
 import "@mantine/tiptap/styles.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import type { AppProps } from "next/app";
 import { createTheme, MantineProvider } from "@mantine/core";
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <MantineProvider theme={theme}>
       <Component {...pageProps} />
+      <SpeedInsights />
     </MantineProvider>
   );
 }
