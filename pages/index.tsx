@@ -15,7 +15,7 @@ import { Innertube, UniversalCache } from "youtubei.js/web";
 export default function Home() {
   const [results, setResults] = useState(Array);
   const [pageInfo, setPageInfo] = useState(Object);
-  const [query, setQuery] = useState("おすすめ");
+  const [query, setQuery] = useState("フリーレン");
 
   async function search(query: string) {
     const yt = await Innertube.create({
@@ -87,8 +87,8 @@ export default function Home() {
   useEffect(() => {
     if (location.search) {
       const params = new URLSearchParams(location.search);
-      setQuery(params.get("q") || "おすすめ");
-      search(params.get("q") || "おすすめ");
+      setQuery(params.get("q") || "フリーレン");
+      search(params.get("q") || "フレーレン");
     } else {
       search(query || "おすすめ");
     }
@@ -97,7 +97,7 @@ export default function Home() {
   //search on load
   return (
     <div>
-      <Header setQuery={setQuery} />
+      <Header setQuery={setQuery} query={query} />
       <Space h={"lg"} />
       <SimpleGrid
         cols={{ xs: 1, sm: 2, md: 2, lg: 3 }}

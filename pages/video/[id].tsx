@@ -158,11 +158,21 @@ export default function Video() {
                         {videoData.secondary_info.owner.subscriber_count.text}
                       </Text>
                     </Stack>
-                    <Badge color="gray" h={"30px"}>
-                      <Text size="xl">
-                        <FiThumbsUp />
-                        {videoData.basic_info.like_count}
-                      </Text>
+                    <Badge color="#ececec" h={"30px"}>
+                      <Group>
+                        <FiThumbsUp
+                          style={{ verticalAlign: "middle" }}
+                          size={"20px"}
+                          color="black"
+                          mr="8px"
+                        />
+                        <Text size="xl" color="black">
+                          {
+                            videoData.primary_info?.menu?.top_level_buttons[0]
+                              .like_button.short_like_count
+                          }
+                        </Text>
+                      </Group>
                     </Badge>
                   </Group>
                   <Card
@@ -559,11 +569,21 @@ export default function Video() {
                       {videoData.secondary_info.owner.subscriber_count.text}
                     </Text>
                   </Stack>
-                  <Badge color="gray" h={"30px"}>
-                    <Text size="xl">
-                      <FiThumbsUp />
-                      {videoData.basic_info.like_count}
-                    </Text>
+                  <Badge color="#ececec" h={"30px"}>
+                    <Group>
+                      <FiThumbsUp
+                        style={{ verticalAlign: "middle" }}
+                        size={"20px"}
+                        color="black"
+                        mr="8px"
+                      />
+                      <Text size="xl" color="black">
+                        {
+                          videoData.primary_info?.menu?.top_level_buttons[0]
+                            .like_button.short_like_count
+                        }
+                      </Text>
+                    </Group>
                   </Badge>
                 </Group>
                 <Spoiler

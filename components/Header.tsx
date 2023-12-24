@@ -49,6 +49,11 @@ export default function Header(props: any) {
                 location.href = `/?q=${e.currentTarget.value}`;
               }
             }}
+            onLoad={
+              props.query
+                ? (e: any) => (e.currentTarget.value = props.query)
+                : undefined
+            }
           />
         </Grid.Col>
         <Grid.Col span={1}></Grid.Col>
