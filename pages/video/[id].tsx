@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import { UUID, randomUUID } from "crypto";
+import shortuuid from "short-uuid";
 import dashjs from "dashjs";
 import {
   Card,
@@ -244,7 +244,7 @@ export default function Video() {
                           }
                           color={item.endpoint ? "blue" : "black"}
                           style={{ cursor: (item.endpoint && "pointer") || "" }}
-                          key={randomUUID()}
+                          key={shortuuid.generate()}
                         >
                           {item.text}
                         </Text>
@@ -584,7 +584,7 @@ export default function Video() {
                     ] as Array<any>)
                   ).map((item: any) => (
                     <Text
-                      key={randomUUID()}
+                      key={shortuuid.generate()}
                       onClick={
                         item.endpoint?.metadata?.url
                           ? () => {
