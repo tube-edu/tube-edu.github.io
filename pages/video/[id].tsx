@@ -118,7 +118,7 @@ export default function Video() {
         `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1`
       );
     }
-  });
+  }, []);
 
   return (
     <div>
@@ -683,6 +683,7 @@ export default function Video() {
                               maxHeight={50}
                               showLabel="更に表示"
                               hideLabel="閉じる"
+                              key={shortuuid.generate()}
                             >
                               {item.comment.content?.runs?.map(
                                 (comment: any) => (
@@ -764,6 +765,7 @@ export default function Video() {
                                         cursor:
                                           (comment.endpoint && "pointer") || "",
                                       }}
+                                      key={shortuuid.generate()}
                                     >
                                       {comment.text}
                                     </Text>
@@ -771,7 +773,7 @@ export default function Video() {
                                 )
                               )}
                             </Spoiler>
-                            <Group>
+                            <Group key={shortuuid.generate()}>
                               <FiThumbsUp
                                 style={{ verticalAlign: "bottom" }}
                                 color="gray"
