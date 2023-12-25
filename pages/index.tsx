@@ -7,14 +7,11 @@ import {
   Text,
   Avatar,
   Group,
-  Grid,
 } from "@mantine/core";
-import { use, useEffect, useState } from "react";
-import { json } from "stream/consumers";
+import { useEffect, useState } from "react";
 import { Innertube, UniversalCache } from "youtubei.js/web";
 export default function Home() {
   const [results, setResults] = useState(Array);
-  const [pageInfo, setPageInfo] = useState(Object);
   const [query, setQuery] = useState("フリーレン");
 
   async function search(query: string) {
@@ -112,7 +109,7 @@ export default function Home() {
             radius={"md"}
             h={"350px"}
             key={video.id}
-            onClick={() => (location.href = `/video/${video.id}`)}
+            onClick={() => (location.href = `/watcg?v=${video.id}`)}
             style={{ cursor: "pointer" }}
           >
             <Card.Section h={"250px"}>

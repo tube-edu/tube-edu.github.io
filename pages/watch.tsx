@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import shortuuid from "short-uuid";
-import dashjs from "dashjs";
 import {
   Card,
   SimpleGrid,
@@ -19,12 +18,10 @@ import {
   Accordion,
 } from "@mantine/core";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Innertube, UniversalCache } from "youtubei.js";
-import { FiThumbsUp, FiThumbsDown } from "react-icons/fi";
+import { FiThumbsUp } from "react-icons/fi";
 import { useRouter } from "next/router";
-import YouTubePlayer from "youtube-player";
-import { useViewportSize } from "@mantine/hooks";
 export default function Video() {
   const router = useRouter();
   const [videoData, setVideoData] = useState(Object);
@@ -36,7 +33,7 @@ export default function Video() {
   const [sortByNewest, setSortByNewest] = useState(false);
 
   useEffect(() => {
-    const video_id = location.pathname.split("/")[2].split(".")[0];
+    const video_id = router.query.v as string;
     setVideoId(video_id);
     console.log(video_id);
     const getVideoData = async (id: string) => {
@@ -100,6 +97,7 @@ export default function Video() {
         },
         cache: new UniversalCache(false),
       });
+      console.log(id);
       const video = await yt.getInfo(id);
       const commentsBR = await yt.getComments(id, "TOP_COMMENTS");
       const commentsBN = await yt.getComments(id, "NEWEST_FIRST");
@@ -107,7 +105,10 @@ export default function Video() {
       setCommentsByNewest(commentsBN.contents);
       setVideoData(video);
     };
-    getVideoData(video_id);
+
+    if (video_id?.length > 0) {
+      getVideoData(video_id);
+    }
     setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
     if (router.query.t) {
       setIframeLink(
@@ -118,7 +119,7 @@ export default function Video() {
         `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1`
       );
     }
-  }, []);
+  }, [router]);
 
   return (
     <div>
@@ -222,7 +223,7 @@ export default function Video() {
                                     const time = redirectUrl.includes("t=")
                                       ? redirectUrl.split("t=")[1].split("&")[0]
                                       : "0";
-                                    redirectUrl = `/video/${video_id}?t=${time}`;
+                                    redirectUrl = `/watch?v=${video_id}&t=${time}`;
                                   }
                                   if (redirectUrl.includes("http")) {
                                     // go to external link
@@ -332,7 +333,7 @@ export default function Video() {
                                                 .split("t=")[1]
                                                 .split("&")[0]
                                             : "0";
-                                          redirectUrl = `/video/${video_id}?t=${time}`;
+                                          redirectUrl = `/watch?v=${video_id}&t=${time}`;
                                         }
                                         if (redirectUrl.includes("http")) {
                                           // go to external link
@@ -439,7 +440,7 @@ export default function Video() {
                                                 .split("t=")[1]
                                                 .split("&")[0]
                                             : "0";
-                                          redirectUrl = `/video/${video_id}?t=${time}`;
+                                          redirectUrl = `/watch?v=${video_id}&t=${time}`;
                                         }
                                         if (redirectUrl.includes("http")) {
                                           // go to external link
@@ -503,7 +504,7 @@ export default function Video() {
                 w={"100%"}
                 key={item.id}
                 onClick={() => {
-                  location.href = `/video/${item.id}`;
+                  location.href = `/watch?v=${item.id}`;
                 }}
                 style={{ cursor: "pointer" }}
               >
@@ -625,7 +626,7 @@ export default function Video() {
                                 const time = redirectUrl.includes("t=")
                                   ? redirectUrl.split("t=")[1].split("&")[0]
                                   : "0";
-                                redirectUrl = `/video/${video_id}?t=${time}`;
+                                redirectUrl = `/watch?v=${video_id}&t=${time}`;
                               }
                               if (redirectUrl.includes("http")) {
                                 // go to external link
@@ -740,7 +741,7 @@ export default function Video() {
                                                         .split("t=")[1]
                                                         .split("&")[0]
                                                     : "0";
-                                                redirectUrl = `/video/${video_id}?t=${time}`;
+                                                redirectUrl = `/watch?v=${video_id}&t=${time}`;
                                               }
                                               if (
                                                 redirectUrl.includes("http")
@@ -859,7 +860,7 @@ export default function Video() {
                                                         .split("t=")[1]
                                                         .split("&")[0]
                                                     : "0";
-                                                redirectUrl = `/video/${video_id}?t=${time}`;
+                                                redirectUrl = `/watch?v=${video_id}&t=${time}`;
                                               }
                                               if (
                                                 redirectUrl.includes("http")
@@ -936,7 +937,7 @@ export default function Video() {
               w={"100%"}
               key={item.id}
               onClick={() => {
-                location.href = `/video/${item.id}`;
+                location.href = `/watch?v=${item.id}`;
               }}
               style={{ cursor: "pointer" }}
             >
