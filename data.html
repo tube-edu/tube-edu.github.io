@@ -1,0 +1,93 @@
+<html lang="ja">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A site to make datas.">
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.11/mvp.css">
+    <title>Data Maker</title>
+</head>
+
+<body>
+    <main>
+        <h1>Data Maker v3</h1>
+        <form action="data.html" method="get">
+            <h2>Data Gen</h2>
+            <h3>時間は　7 → 70 のように、10倍して入力！</h3>
+            <label for="A">A</label>
+            <input type="number" name="A" id="A" value="" required />
+            <label for="B">B</label>
+            <input type="number" name="B" id="B" value="" required />
+            <label for="C">C</label>
+            <input type="number" name="C" id="C" value="" required />
+            <label for="D">D</label>
+            <input type="number" name="D" id="D" value="" required />
+            <label for="E">E</label>
+            <input type="number" name="E" id="E" value="" required />
+            <label for="G">kg</label>
+            <input type="number" name="G" id="G" value="" required />
+            <button type="button" name="go" onclick="generate()">Generate</button>
+            <table id="table">
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>E</th>
+                    <th>Sum</th>
+                    <th>Level</th>
+                    <th>Cal</th>
+                </tr>
+            </table>
+        </form>
+    </main>
+
+    <script>
+        function generate() {
+            var A = parseInt(document.getElementById("A").value);
+            var B = parseInt(document.getElementById("B").value);
+            var C = parseInt(document.getElementById("C").value);
+            var D = parseInt(document.getElementById("D").value);
+            var E = parseInt(document.getElementById("E").value);
+            var G = parseInt(document.getElementById("G").value);
+            
+            
+
+            var Asum = A*9
+            var Bsum = B*15
+            var Csum = C*25
+            var Dsum = D*45
+            var Esum = E*70
+            var sum = (Asum + Bsum + Csum + Dsum + Esum)/100
+            var level = sum / 24
+            var cal = (sum*105*G)/100
+            
+            
+
+            var table = document.getElementById("table");
+            while (table.rows.length > 1){
+table.deleteRow(1);
+    }
+            var row = table.insertRow(-1);
+            var Arow = row.insertCell(0);
+            var Brow = row.insertCell(1);
+            var Crow = row.insertCell(2);
+            var Drow = row.insertCell(3);
+            var Erow = row.insertCell(4);
+            var Sumrow = row.insertCell(5);
+            var levrow = row.insertCell(6);
+            var calrow = row.insertCell(7);
+
+            Arow.innerHTML = Asum/100
+            Brow.innerHTML = Bsum/100
+            Crow.innerHTML = Csum/100
+            Drow.innerHTML = Dsum/100
+            Erow.innerHTML = Esum/100
+            Sumrow.innerHTML = sum
+            levrow.innerHTML = level
+            calrow.innerHTML = cal
+            
+        }
+    </script>
+</body>
+
+</html>

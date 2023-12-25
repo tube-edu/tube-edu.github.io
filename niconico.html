@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+  <title>YT Viewer</title>
+</head>
+
+<body>
+    <nav class="flex items-center justify-between flex-wrap bg-teal-500 p-6">
+        <div class="flex items-center flex-shrink-0 text-white mr-6">
+            <span class="font-semibold text-xl tracking-tight">YT Viewer</span>
+        </div>
+        <a href="https://www.bbc.com/japanese">
+        <button class="bg-red-500 px-4 py-2 rounded text-gray-100 ">Escape</button>
+        </a>
+    </nav>
+    <div class="grid gap-6 mb-6 mx-4 my-4">
+        <div>
+            <label for="video_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">URL</label>
+            <input type="text" id="video_id"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="XXXXXXX" required>
+        </div>
+        <script type="application/javascript" src="https://embed.nicovideo.jp/watch/sm40564386/script?w=720&h=480"></script>
+        
+    </div>
+    <button class="bg-emerald-300 rounded w-full px-4 py-2 my-4 mx-4 mr-8">Download</button>
+    <script>
+        // when video_id is changed, change ifra
+        document.getElementById("video_id").addEventListener("change", function() {
+            var video_id = this.value.match(/watch\/(sm\d+)/)([\w-]+)/)[1];
+            document.getElementsByTagName("script")[0].src = "https://embed.nicovideo.jp/watch/" + video_id + "/script?w=720&h=480";
+        });
+    </script>
+</body>
+
+</html>
