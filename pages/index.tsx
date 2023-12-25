@@ -109,7 +109,7 @@ export default function Home() {
             radius={"md"}
             h={"350px"}
             key={video.id}
-            onClick={() => (location.href = `/watcg?v=${video.id}`)}
+            onClick={() => (location.href = `/watch?v=${video.id}`)}
             style={{ cursor: "pointer" }}
           >
             <Card.Section h={"250px"}>
