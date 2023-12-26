@@ -16,11 +16,12 @@ import {
   Divider,
   Switch,
   Accordion,
+  ActionIcon,
 } from "@mantine/core";
 
 import { useEffect, useState } from "react";
 import { Innertube, UniversalCache } from "youtubei.js";
-import { FiThumbsUp } from "react-icons/fi";
+import { FiDownload, FiMusic, FiThumbsUp, FiVideo } from "react-icons/fi";
 import { useRouter } from "next/router";
 export default function Video() {
   const router = useRouter();
@@ -31,6 +32,136 @@ export default function Video() {
   const [commentsByNewest, setCommentsByNewest] = useState(Array);
   const [iframeLink, setIframeLink] = useState(String);
   const [sortByNewest, setSortByNewest] = useState(false);
+  const [downloadLink, setDownloadLink] = useState(String);
+  const [audioLink, setAudioLink] = useState(String);
+
+  const downloadVid = async (id: string) => {
+    console.log("Downloading video");
+    const yt = await Innertube.create({
+      generate_session_locally: true,
+      lang: "ja",
+      location: "JP",
+      fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url =
+          typeof input === "string"
+            ? new URL(input)
+            : input instanceof URL
+            ? input
+            : new URL(input.url);
+
+        // Transform the url for use with our proxy.
+        url.searchParams.set("__host", url.host);
+        url.host = "kokohachi.deno.dev";
+        url.protocol = "https";
+
+        const headers = init?.headers
+          ? new Headers(init.headers)
+          : input instanceof Request
+          ? input.headers
+          : new Headers();
+
+        // Now serialize the headers.
+        // @ts-ignore
+        url.searchParams.set("__headers", JSON.stringify([...headers]));
+
+        if (input instanceof Request) {
+          // @ts-ignore
+          input.duplex = "half";
+        }
+
+        // Copy over the request.
+        const request = new Request(
+          url,
+          input instanceof Request ? input : undefined
+        );
+
+        headers.delete("user-agent");
+
+        return fetch(
+          request,
+          init
+            ? {
+                ...init,
+                headers,
+              }
+            : {
+                headers,
+              }
+        );
+        // failed to fetch
+
+        // return fetch(request, init).then((res) => {
+        //   console.log(res);
+        //   return res;
+        // });
+      },
+      cache: new UniversalCache(false),
+    });
+
+    const stream = await yt.download(id, {
+      quality: "best",
+      type: "video+audio",
+      client: "ANDROID",
+    });
+    // ReadableStream を読み取るための Reader を取得
+    const reader = stream.getReader();
+
+    // データを格納するための配列
+    const chunks: Uint8Array[] = [];
+
+    // ReadableStream を読み取り、chunks 配列に格納
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      chunks.push(value);
+    }
+    //set filename to id.mp4
+
+    const blob = new Blob(chunks, { type: "application/octet-stream" });
+
+    const url = URL.createObjectURL(blob);
+    setDownloadLink(url);
+
+    const audioStream = await yt.download(id, {
+      quality: "best",
+      type: "audio",
+      client: "ANDROID",
+      format: "mp4",
+    });
+    // ReadableStream を読み取るための Reader を取得
+    const audioReader = audioStream.getReader();
+
+    // データを格納するための配列
+    const audioChunks: Uint8Array[] = [];
+
+    // ReadableStream を読み取り、chunks 配列に格納
+
+    while (true) {
+      const { done, value } = await audioReader.read();
+
+      if (done) {
+        break;
+      }
+
+      audioChunks.push(value);
+    }
+
+    //set filename to id.mp4
+
+    const audioBlob = new Blob(audioChunks, {
+      type: "application/octet-stream",
+    });
+
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    setAudioLink(audioUrl);
+
+    console.log(audioUrl);
+  };
 
   useEffect(() => {
     const video_id = router.query.v as string;
@@ -98,7 +229,8 @@ export default function Video() {
         cache: new UniversalCache(false),
       });
       console.log(id);
-      const video = await yt.getInfo(id);
+      const video = await yt.getInfo(id, "ANDROID");
+      console.log(video);
       const commentsBR = await yt.getComments(id, "TOP_COMMENTS");
       const commentsBN = await yt.getComments(id, "NEWEST_FIRST");
       setCommentsByRelevance(commentsBR.contents);
@@ -107,7 +239,15 @@ export default function Video() {
     };
 
     if (video_id?.length > 0) {
-      getVideoData(video_id);
+      getVideoData(video_id).then(
+        () => {
+          downloadVid(video_id);
+          console.log("done");
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
     }
     setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
     if (router.query.t) {
@@ -175,12 +315,45 @@ export default function Video() {
                         </Text>
                       </Group>
                     </Badge>
+                    <Stack gap={"0"}>
+                      <Text size="xs" color="gray" mb={0}>
+                        ダウンロード
+                      </Text>
+                      <Group mb={0} mt={0}>
+                        <ActionIcon
+                          onClick={() => {
+                            const url = downloadLink;
+                            const linkElement = document.createElement("a");
+                            linkElement.href = url;
+                            linkElement.target = "_blank";
+                            linkElement.download = `${video_id}.mp4`;
+                            linkElement.click();
+                          }}
+                          disabled={downloadLink.length === 0}
+                        >
+                          <FiVideo />
+                        </ActionIcon>
+                        <ActionIcon
+                          onClick={() => {
+                            const url = audioLink;
+                            const linkElement = document.createElement("a");
+                            linkElement.href = url;
+                            linkElement.target = "_blank";
+                            linkElement.download = `${video_id}.mp4`;
+                            linkElement.click();
+                          }}
+                          disabled={audioLink.length === 0}
+                        >
+                          <FiMusic />
+                        </ActionIcon>
+                      </Group>
+                    </Stack>
                   </Group>
                   <Card
                     mt={"xs"}
                     radius={"sm"}
                     w={"100%"}
-                    style={{ backgroundColor: "rgba(223,223,223,10)" }}
+                    style={{ backgroundColor: "#ececec" }}
                   >
                     <Spoiler
                       maxHeight={50}
@@ -586,6 +759,39 @@ export default function Video() {
                       </Text>
                     </Group>
                   </Badge>
+                  <Stack gap={"0"}>
+                    <Text size="xs" color="gray" mb={0}>
+                      ダウンロード
+                    </Text>
+                    <Group mb={0} mt={0}>
+                      <ActionIcon
+                        onClick={() => {
+                          const url = downloadLink;
+                          const linkElement = document.createElement("a");
+                          linkElement.href = url;
+                          linkElement.target = "_blank";
+                          linkElement.download = `${video_id}.mp4`;
+                          linkElement.click();
+                        }}
+                        disabled={downloadLink.length === 0}
+                      >
+                        <FiVideo />
+                      </ActionIcon>
+                      <ActionIcon
+                        onClick={() => {
+                          const url = audioLink;
+                          const linkElement = document.createElement("a");
+                          linkElement.href = url;
+                          linkElement.target = "_blank";
+                          linkElement.download = `${video_id}.mp4`;
+                          linkElement.click();
+                        }}
+                        disabled={audioLink.length === 0}
+                      >
+                        <FiMusic />
+                      </ActionIcon>
+                    </Group>
+                  </Stack>
                 </Group>
                 <Spoiler
                   maxHeight={50}
