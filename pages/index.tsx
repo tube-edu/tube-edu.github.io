@@ -29,7 +29,7 @@ export default function Home() {
 
         // Transform the url for use with our proxy.
         url.searchParams.set("__host", url.host);
-        url.host = "tube-backend.deno.dev";
+        url.host = "kokohachi.deno.dev";
         url.protocol = "https";
 
         const headers = init?.headers
