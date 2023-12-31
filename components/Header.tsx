@@ -56,7 +56,11 @@ export default function Header(props: any) {
             }
           />
         </Grid.Col>
-        <Grid.Col span={1}></Grid.Col>
+        <Grid.Col span={1}>
+          <Text size="sm" color="gray" fw={"lighter"} my={"6px"}>
+            v 1.1.2
+          </Text>
+        </Grid.Col>
       </Grid>
     </Paper>
   );
