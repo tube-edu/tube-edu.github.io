@@ -207,8 +207,10 @@ export default function Video() {
                                 (item: any) =>
                                   item.has_audio === true &&
                                   item.has_video === false
-                              )[0];
+                              );
+
                             const linkElement = document.createElement("a");
+                            console.log(audioFormat);
                             linkElement.href = audioFormat.url;
                             linkElement.click();
                           }}

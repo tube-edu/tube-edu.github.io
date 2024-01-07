@@ -7,12 +7,16 @@ import {
   Text,
   Avatar,
   Group,
+  Loader,
+  Overlay,
+  Center,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Innertube, UniversalCache } from "youtubei.js/web";
 export default function Home() {
   const [results, setResults] = useState(Array);
   const [query, setQuery] = useState("フリーレン");
+  const [loading, setLoading] = useState(true);
 
   async function search(query: string) {
     const yt = await Innertube.create({
@@ -90,56 +94,62 @@ export default function Home() {
       search(query || "おすすめ");
     }
   }, [query]);
+  function VideoCardComponent(props: any) {
+    return results.map((video: any) => (
+      <Card
+        shadow="md"
+        radius={"md"}
+        h={"350px"}
+        key={video.id}
+        onClick={() => (location.href = `/watch?v=${video.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        <Card.Section h={"250px"}>
+          <Image
+            src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+            mah={"100%"}
+            maw={"100%"}
+            alt="Norway"
+          />
+        </Card.Section>
+
+        <Text size="lg" lineClamp={1} mt={"xs"}>
+          {video.title.text}
+        </Text>
+        <Group>
+          <Avatar src={video.author.thumbnails[0].url} radius="xl" size="md" />
+          <Text size="sm" color="gray">
+            {video.author.name.slice(0, 30)}
+            {video.author.name.length > 30 && "..."}
+            <br />
+            {video.published.text}・{video.short_view_count.text}
+          </Text>
+        </Group>
+      </Card>
+    ));
+  }
 
   //search on load
   return (
     <div>
       <Header setQuery={setQuery} query={query} />
       <Space h={"lg"} />
-      <SimpleGrid
-        cols={{ xs: 1, sm: 2, md: 2, lg: 3 }}
-        spacing="lg"
-        verticalSpacing="lg"
-        w={"90%"}
-        m={"auto"}
-      >
-        {results.map((video: any) => (
-          <Card
-            shadow="md"
-            radius={"md"}
-            h={"350px"}
-            key={video.id}
-            onClick={() => (location.href = `/watch?v=${video.id}`)}
-            style={{ cursor: "pointer" }}
-          >
-            <Card.Section h={"250px"}>
-              <Image
-                src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
-                mah={"100%"}
-                maw={"100%"}
-                alt="Norway"
-              />
-            </Card.Section>
 
-            <Text size="lg" lineClamp={1} mt={"xs"}>
-              {video.title.text}
-            </Text>
-            <Group>
-              <Avatar
-                src={video.author.thumbnails[0].url}
-                radius="xl"
-                size="md"
-              />
-              <Text size="sm" color="gray">
-                {video.author.name.slice(0, 30)}
-                {video.author.name.length > 30 && "..."}
-                <br />
-                {video.published.text}・{video.short_view_count.text}
-              </Text>
-            </Group>
-          </Card>
-        ))}
-      </SimpleGrid>
+      {results.length > 0 ? (
+        <SimpleGrid
+          cols={{ xs: 1, sm: 2, md: 2, lg: 3 }}
+          spacing="lg"
+          verticalSpacing="lg"
+          w={"90%"}
+          m={"auto"}
+        >
+          <VideoCardComponent />
+        </SimpleGrid>
+      ) : (
+        <Center>
+          <Loader style={{ margin: "auto" }} color="pink" />
+        </Center>
+      )}
     </div>
   );
 }
