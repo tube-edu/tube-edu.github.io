@@ -2302,6 +2302,11 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.4"
 
+fetch-no-cors@^1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/fetch-no-cors/-/fetch-no-cors-1.0.13.tgz#7a64a4d26eef284236d68beb0c7d4ae95d5ae740"
+  integrity sha512-Fbksv4IymuO99Zf+umHJohoTP9naAWKWVC0VdGIPZ1J28GUZ2pwparpB+Wm9uamu0zJKW8LOOqk8UGwvcn3zHA==
+
 file-entry-cache@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/file-entry-cache/-/file-entry-cache-6.0.1.tgz#211b2dd9659cb0394b073e7323ac3c933d522027"
