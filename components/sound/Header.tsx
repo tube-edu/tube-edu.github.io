@@ -7,17 +7,15 @@ import {
   Avatar,
   Autocomplete,
 } from "@mantine/core";
-import { PiYoutubeLogoDuotone } from "react-icons/pi";
+import { PiSoundcloudLogoDuotone, PiYoutubeLogoDuotone } from "react-icons/pi";
 import { Input } from "@mantine/core";
 import { IoSearchOutline } from "react-icons/io5";
 import { useState } from "react";
 import Innertube, { UniversalCache } from "youtubei.js";
-import { useRouter } from "next/navigation";
 
 export default function Header(props: any) {
   const [autocompletedata, setAutocompletedata] = useState(Array<string>());
   const [query, setQuery] = useState("");
-  const router = useRouter();
   const handleQueryChange = (query: string) => {
     props.setQuery(query);
   };
@@ -36,7 +34,7 @@ export default function Header(props: any) {
 
         // Transform the url for use with our proxy.
         url.searchParams.set("__host", url.host);
-        url.host = "kokohachi.deno.dev";
+        url.host = "tubebackend-1-w0058933.deta.app";
         url.protocol = "https";
 
         const headers = init?.headers
@@ -102,18 +100,18 @@ export default function Header(props: any) {
           <Text
             size="xl"
             fw={700}
-            onClick={() => router.push("/")}
+            onClick={() => (location.href = "/")}
             style={{ cursor: "pointer" }}
           >
-            <PiYoutubeLogoDuotone
+            <PiSoundcloudLogoDuotone
               size={32}
               style={{
                 verticalAlign: "bottom",
                 marginRight: 8,
-                color: "#e83976",
+                color: "#ff7700",
               }}
             />
-            The Tube
+            The Sound
           </Text>
         </Grid.Col>
         <Grid.Col span={8}>
@@ -143,7 +141,7 @@ export default function Header(props: any) {
         </Grid.Col>
         <Grid.Col span={1}>
           <Text size="sm" color="gray" fw={"lighter"} my={"6px"}>
-            v 1.1.3
+            v 0.0.1
           </Text>
         </Grid.Col>
       </Grid>

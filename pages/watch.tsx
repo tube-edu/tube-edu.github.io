@@ -17,6 +17,8 @@ import {
   Switch,
   Accordion,
   ActionIcon,
+  Loader,
+  Center,
 } from "@mantine/core";
 
 import { useEffect, useState } from "react";
@@ -34,6 +36,7 @@ export default function Video() {
   const [sortByNewest, setSortByNewest] = useState(false);
   const [downloadLink, setDownloadLink] = useState(String);
   const [audioLink, setAudioLink] = useState(String);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const video_id = router.query.v as string;
@@ -54,7 +57,7 @@ export default function Video() {
 
           // Transform the url for use with our proxy.
           url.searchParams.set("__host", url.host);
-          url.host = "tubebackend-1-w0058933.deta.app";
+          url.host = "kokohachi.deno.dev";
           url.protocol = "https";
 
           const headers = init?.headers
@@ -103,20 +106,18 @@ export default function Video() {
       console.log(id);
       const video = await yt.getInfo(id, "ANDROID");
       console.log(video);
-      const commentsBR = await yt.getComments(id, "TOP_COMMENTS");
-      const commentsBN = await yt.getComments(id, "NEWEST_FIRST");
-      setCommentsByRelevance(commentsBR.contents);
-      setCommentsByNewest(commentsBN.contents);
+      if (typeof video.comments_entry_point_header !== "undefined") {
+        const commentsBR = await yt.getComments(id, "TOP_COMMENTS");
+        const commentsBN = await yt.getComments(id, "NEWEST_FIRST");
+        setCommentsByRelevance(commentsBR.contents ?? []);
+        setCommentsByNewest(commentsBN.contents ?? []);
+      }
       setVideoData(video);
     };
 
     if (video_id?.length > 0) {
-      getVideoData(video_id).then(
-        () => {},
-        (err) => {
-          console.log(err);
-        }
-      );
+      getVideoData(video_id);
+      setLoading(false);
     }
     setIsLandscape(window.matchMedia("(orientation: landscape)").matches);
     if (router.query.t) {
@@ -129,459 +130,10 @@ export default function Video() {
       );
     }
   }, [router]);
-
-  return (
-    <div>
-      <Header />
-      {isLandscape ? (
-        <Grid w={"90%"} m={"auto"} mt={"lg"}>
-          <Grid.Col span={8}>
-            {videoData.secondary_info && (
-              <>
-                <Card>
-                  <Card.Section>
-                    <iframe
-                      id="ytplayer"
-                      width="100%"
-                      height="500px"
-                      src={iframeLink}
-                      frameBorder="0"
-                      allowFullScreen
-                    ></iframe>
-                  </Card.Section>
-                  <Text size="xl" fw={700} mt={"sm"} lineClamp={2}>
-                    {videoData.primary_info?.title.text}
-                  </Text>
-                  <Group>
-                    <Avatar
-                      src={
-                        videoData.secondary_info.owner.author.thumbnails[0].url
-                      }
-                      size="md"
-                      style={{ verticalAlign: "bottom" }}
-                    />
-                    <Stack gap={"0"} mr={"auto"}>
-                      <Text size="md">
-                        {videoData.secondary_info.owner.author.name}
-                      </Text>
-                      <Text size="xs" color="gray">
-                        {videoData.secondary_info.owner.subscriber_count.text}
-                      </Text>
-                    </Stack>
-                    <Badge color="#ececec" h={"30px"}>
-                      <Group>
-                        <FiThumbsUp
-                          style={{ verticalAlign: "middle" }}
-                          size={"20px"}
-                          color="black"
-                          mr="8px"
-                        />
-                        <Text size="xl" color="black">
-                          {
-                            videoData.primary_info?.menu?.top_level_buttons[0]
-                              .like_button.short_like_count
-                          }
-                        </Text>
-                      </Group>
-                    </Badge>
-                    <Stack gap={"0"}>
-                      <Text size="xs" color="gray" mb={0}>
-                        ダウンロード
-                      </Text>
-                      <Group mb={0} mt={0}>
-                        <ActionIcon
-                          onClick={() => {
-                            const linkElement = document.createElement("a");
-                            linkElement.href =
-                              videoData?.streaming_data?.formats?.[0]?.url;
-                            linkElement.click();
-                          }}
-                        >
-                          <FiVideo />
-                        </ActionIcon>
-                        <ActionIcon
-                          onClick={() => {
-                            //find url from adaptive formats, has_audio is true, has_video is false
-                            const audioFormat =
-                              videoData?.streaming_data?.adaptive_formats?.find(
-                                (item: any) =>
-                                  item.has_audio === true &&
-                                  item.has_video === false
-                              );
-
-                            const linkElement = document.createElement("a");
-                            console.log(audioFormat);
-                            linkElement.href = audioFormat.url;
-                            linkElement.click();
-                          }}
-                        >
-                          <FiMusic />
-                        </ActionIcon>
-                      </Group>
-                    </Stack>
-                  </Group>
-                  <Card
-                    mt={"xs"}
-                    radius={"sm"}
-                    w={"100%"}
-                    style={{ backgroundColor: "#ececec" }}
-                  >
-                    <Spoiler
-                      maxHeight={50}
-                      showLabel="続きを読む"
-                      hideLabel="閉じる"
-                    >
-                      <Text size="sm" fw={600}>
-                        {videoData.primary_info.view_count.text}・
-                        {videoData.primary_info.published.text}公開
-                      </Text>
-                      {(
-                        videoData.secondary_info?.description?.runs ??
-                        ([
-                          {
-                            text: "概要欄は空です",
-                          },
-                        ] as Array<any>)
-                      ).map((item: any) => (
-                        <Text
-                          onClick={
-                            item.endpoint?.metadata?.url
-                              ? () => {
-                                  let redirectUrl =
-                                    item.endpoint?.metadata?.url;
-
-                                  if (
-                                    redirectUrl.includes(
-                                      "youtube.com/redirect"
-                                    ) &&
-                                    redirectUrl.includes("q=")
-                                  ) {
-                                    redirectUrl = decodeURIComponent(
-                                      redirectUrl.split("q=")[1].split("&")[0]
-                                    );
-                                    console.log(redirectUrl);
-                                  } else if (redirectUrl.includes("/watch")) {
-                                    const video_id = redirectUrl
-                                      .split("v=")[1]
-                                      .split("&")[0];
-                                    const time = redirectUrl.includes("t=")
-                                      ? redirectUrl.split("t=")[1].split("&")[0]
-                                      : "0";
-                                    redirectUrl = `/watch?v=${video_id}&t=${time}`;
-                                  }
-                                  if (redirectUrl.includes("http")) {
-                                    // go to external link
-                                    // create a link element
-                                    const linkElement =
-                                      document.createElement("a");
-                                    // set link's href to the path
-                                    linkElement.href = redirectUrl;
-                                    // set link's target to _blank
-                                    linkElement.target = "_blank";
-                                    // simulate click on the link
-                                    linkElement.click();
-                                  } else if (redirectUrl.includes("t=")) {
-                                    const time = parseInt(
-                                      redirectUrl.split("t=")[1].split("&")[0]
-                                    );
-                                    console.log(time);
-                                    const player =
-                                      document.getElementById("ytplayer");
-                                    player?.setAttribute(
-                                      "src",
-                                      `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
-                                    );
-                                  } else {
-                                    location.href = redirectUrl;
-                                  }
-                                }
-                              : () => {}
-                          }
-                          color={item.endpoint ? "blue" : "black"}
-                          style={{ cursor: (item.endpoint && "pointer") || "" }}
-                          key={shortuuid.generate()}
-                        >
-                          {item.text}
-                        </Text>
-                      ))}
-                    </Spoiler>
-                  </Card>
-                </Card>
-                <Group>
-                  <Text size="xl" fw={700} mt={"sm"}>
-                    {commentsByNewest.length}件のコメント
-                  </Text>
-
-                  <Switch
-                    label="新しい順"
-                    onChange={() => {
-                      setSortByNewest(!sortByNewest);
-                    }}
-                    style={{ float: "right" }}
-                    ml={"auto"}
-                  />
-                </Group>
-                <Divider />
-                {!sortByNewest
-                  ? commentsByRelevance.map((item: any) => (
-                      <Card w={"100%"} key={item.comment.comment_id}>
-                        <Group>
-                          <Avatar
-                            src={item.comment.author.thumbnails[0].url}
-                            size="md"
-                            style={{ verticalAlign: "bottom" }}
-                          />
-                          <Text size="sm" color="gray">
-                            {item.comment.author.name}
-                          </Text>
-                          <Text size="xs" color="gray">
-                            {item.comment.published.text}
-                          </Text>
-                        </Group>
-                        <Spoiler
-                          maxHeight={50}
-                          showLabel="更に表示"
-                          hideLabel="閉じる"
-                        >
-                          {item.comment.content?.runs?.map((comment: any) => (
-                            <>
-                              <Text
-                                onClick={
-                                  comment.endpoint?.metadata?.url
-                                    ? () => {
-                                        let redirectUrl =
-                                          comment.endpoint?.metadata?.url;
-
-                                        if (
-                                          redirectUrl.includes(
-                                            "youtube.com/redirect"
-                                          ) &&
-                                          redirectUrl.includes("q=")
-                                        ) {
-                                          redirectUrl = decodeURIComponent(
-                                            redirectUrl
-                                              .split("q=")[1]
-                                              .split("&")[0]
-                                          );
-                                          console.log(redirectUrl);
-                                        } else if (
-                                          redirectUrl.includes("/watch")
-                                        ) {
-                                          const video_id = redirectUrl
-                                            .split("v=")[1]
-                                            .split("&")[0];
-                                          const time = redirectUrl.includes(
-                                            "t="
-                                          )
-                                            ? redirectUrl
-                                                .split("t=")[1]
-                                                .split("&")[0]
-                                            : "0";
-                                          redirectUrl = `/watch?v=${video_id}&t=${time}`;
-                                        }
-                                        if (redirectUrl.includes("http")) {
-                                          // go to external link
-                                          // create a link element
-                                          const linkElement =
-                                            document.createElement("a");
-                                          // set link's href to the path
-                                          linkElement.href = redirectUrl;
-                                          // set link's target to _blank
-                                          linkElement.target = "_blank";
-                                          // simulate click on the link
-                                          linkElement.click();
-                                        } else if (redirectUrl.includes("t=")) {
-                                          const time = parseInt(
-                                            redirectUrl
-                                              .split("t=")[1]
-                                              .split("&")[0]
-                                          );
-                                          console.log(time);
-                                          const player =
-                                            document.getElementById("ytplayer");
-                                          player?.setAttribute(
-                                            "src",
-                                            `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
-                                          );
-                                        } else {
-                                          location.href = redirectUrl;
-                                        }
-                                      }
-                                    : () => {}
-                                }
-                                color={comment.endpoint ? "blue" : "black"}
-                                style={{
-                                  cursor: (comment.endpoint && "pointer") || "",
-                                }}
-                              >
-                                {comment.text}
-                              </Text>
-                            </>
-                          ))}
-                        </Spoiler>
-                        <Group>
-                          <FiThumbsUp
-                            style={{ verticalAlign: "bottom" }}
-                            color="gray"
-                          />
-                          <Text size="sm" color="gray">
-                            {item.comment.vote_count}
-                          </Text>
-                        </Group>
-                      </Card>
-                    ))
-                  : commentsByNewest.map((item: any) => (
-                      <Card w={"100%"} key={item.comment.comment_id}>
-                        <Group>
-                          <Avatar
-                            src={item.comment.author.thumbnails[0].url}
-                            size="md"
-                            style={{ verticalAlign: "bottom" }}
-                          />
-                          <Text size="sm" color="gray">
-                            {item.comment.author.name}
-                          </Text>
-                          <Text size="xs" color="gray">
-                            {item.comment.published.text}
-                          </Text>
-                        </Group>
-                        <Spoiler
-                          maxHeight={50}
-                          showLabel="更に表示"
-                          hideLabel="閉じる"
-                        >
-                          {item.comment.content?.runs?.map((comment: any) => (
-                            <>
-                              <Text
-                                onClick={
-                                  comment.endpoint?.metadata?.url
-                                    ? () => {
-                                        let redirectUrl =
-                                          comment.endpoint?.metadata?.url;
-
-                                        if (
-                                          redirectUrl.includes(
-                                            "youtube.com/redirect"
-                                          ) &&
-                                          redirectUrl.includes("q=")
-                                        ) {
-                                          redirectUrl = decodeURIComponent(
-                                            redirectUrl
-                                              .split("q=")[1]
-                                              .split("&")[0]
-                                          );
-                                          console.log(redirectUrl);
-                                        } else if (
-                                          redirectUrl.includes("/watch")
-                                        ) {
-                                          const video_id = redirectUrl
-                                            .split("v=")[1]
-                                            .split("&")[0];
-                                          const time = redirectUrl.includes(
-                                            "t="
-                                          )
-                                            ? redirectUrl
-                                                .split("t=")[1]
-                                                .split("&")[0]
-                                            : "0";
-                                          redirectUrl = `/watch?v=${video_id}&t=${time}`;
-                                        }
-                                        if (redirectUrl.includes("http")) {
-                                          // go to external link
-                                          // create a link element
-                                          const linkElement =
-                                            document.createElement("a");
-                                          // set link's href to the path
-                                          linkElement.href = redirectUrl;
-                                          // set link's target to _blank
-                                          linkElement.target = "_blank";
-                                          // simulate click on the link
-                                          linkElement.click();
-                                        } else if (redirectUrl.includes("t=")) {
-                                          const time = parseInt(
-                                            redirectUrl
-                                              .split("t=")[1]
-                                              .split("&")[0]
-                                          );
-                                          console.log(time);
-                                          const player =
-                                            document.getElementById("ytplayer");
-                                          player?.setAttribute(
-                                            "src",
-                                            `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
-                                          );
-                                        } else {
-                                          location.href = redirectUrl;
-                                        }
-                                      }
-                                    : () => {}
-                                }
-                                color={comment.endpoint ? "blue" : "black"}
-                                style={{
-                                  cursor: (comment.endpoint && "pointer") || "",
-                                }}
-                              >
-                                {comment.text}
-                              </Text>
-                            </>
-                          ))}
-                        </Spoiler>
-                        <Group>
-                          <FiThumbsUp
-                            style={{ verticalAlign: "bottom" }}
-                            color="gray"
-                          />
-                          <Text size="sm" color="gray">
-                            {item.comment.vote_count}
-                          </Text>
-                        </Group>
-                      </Card>
-                    ))}
-              </>
-            )}
-          </Grid.Col>
-          <Grid.Col span={4}>
-            {videoData.watch_next_feed?.map((item: any) => (
-              <Card
-                p={"sm"}
-                radius={"sm"}
-                w={"100%"}
-                key={item.id}
-                onClick={() => {
-                  location.href = `/watch?v=${item.id}`;
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                <Grid>
-                  <Grid.Col span={6}>
-                    <Image
-                      src={item.thumbnails[0]?.url}
-                      width={"100%"}
-                      radius={"lg"}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={6}>
-                    <Text size="md" fw={600} lineClamp={2}>
-                      {item.title?.text}
-                    </Text>
-                    <Group>
-                      <Stack gap={"0"} mr={"auto"}>
-                        <Text size="xs" color="gray" lineClamp={1}>
-                          {item.author?.name}
-                        </Text>
-                        <Text size="xs" color="gray" lineClamp={1}>
-                          {item.short_view_count?.text}
-                        </Text>
-                      </Stack>
-                    </Group>
-                  </Grid.Col>
-                </Grid>
-              </Card>
-            ))}
-          </Grid.Col>
-        </Grid>
-      ) : (
-        <Container w={"90%"} m={"auto"} mt={"lg"}>
+  function VideoCard() {
+    return isLandscape ? (
+      <Grid w={"90%"} m={"auto"} mt={"lg"}>
+        <Grid.Col span={8}>
           {videoData.secondary_info && (
             <>
               <Card>
@@ -589,13 +141,13 @@ export default function Video() {
                   <iframe
                     id="ytplayer"
                     width="100%"
-                    height="400px"
-                    src={`https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1`}
+                    height="500px"
+                    src={iframeLink}
                     frameBorder="0"
                     allowFullScreen
                   ></iframe>
                 </Card.Section>
-                <Text size="xl" fw={700} mt={"sm"}>
+                <Text size="xl" fw={700} mt={"sm"} lineClamp={2}>
                   {videoData.primary_info?.title.text}
                 </Text>
                 <Group>
@@ -637,376 +189,355 @@ export default function Video() {
                     <Group mb={0} mt={0}>
                       <ActionIcon
                         onClick={() => {
-                          const url = downloadLink;
                           const linkElement = document.createElement("a");
-                          linkElement.href = url;
-                          linkElement.target = "_blank";
-                          linkElement.download = `${video_id}.mp4`;
+                          linkElement.href =
+                            videoData?.streaming_data?.formats?.[0]?.url;
                           linkElement.click();
                         }}
-                        disabled={downloadLink.length === 0}
+                        disabled
                       >
                         <FiVideo />
                       </ActionIcon>
                       <ActionIcon
                         onClick={() => {
-                          const url = audioLink;
+                          //find url from adaptive formats, has_audio is true, has_video is false
+                          const audioFormat =
+                            videoData?.streaming_data?.adaptive_formats?.find(
+                              (item: any) =>
+                                item.has_audio === true &&
+                                item.has_video === false
+                            );
+
                           const linkElement = document.createElement("a");
-                          linkElement.href = url;
-                          linkElement.target = "_blank";
-                          linkElement.download = `${video_id}.mp4`;
+                          console.log(audioFormat);
+                          linkElement.href = audioFormat.url;
                           linkElement.click();
                         }}
-                        disabled={audioLink.length === 0}
+                        disabled
                       >
                         <FiMusic />
                       </ActionIcon>
                     </Group>
                   </Stack>
                 </Group>
-                <Spoiler
-                  maxHeight={50}
-                  showLabel="続きを読む"
-                  hideLabel="閉じる"
+                <Card
+                  mt={"xs"}
+                  radius={"sm"}
+                  w={"100%"}
+                  style={{ backgroundColor: "#ececec" }}
                 >
-                  <Text size="sm" fw={600}>
-                    {videoData.primary_info.view_count.text}・
-                    {videoData.primary_info.published.text}公開
-                  </Text>
-                  {(
-                    videoData.secondary_info?.description?.runs ??
-                    ([
-                      {
-                        text: "概要欄は空です",
-                      },
-                    ] as Array<any>)
-                  ).map((item: any) => (
-                    <Text
-                      key={shortuuid.generate()}
-                      onClick={
-                        item.endpoint?.metadata?.url
-                          ? () => {
-                              let redirectUrl = item.endpoint?.metadata?.url;
-
-                              if (
-                                redirectUrl.includes("youtube.com/redirect") &&
-                                redirectUrl.includes("q=")
-                              ) {
-                                redirectUrl = decodeURIComponent(
-                                  redirectUrl.split("q=")[1].split("&")[0]
-                                );
-                                console.log(redirectUrl);
-                              } else if (redirectUrl.includes("/watch")) {
-                                const video_id = redirectUrl
-                                  .split("v=")[1]
-                                  .split("&")[0];
-                                const time = redirectUrl.includes("t=")
-                                  ? redirectUrl.split("t=")[1].split("&")[0]
-                                  : "0";
-                                redirectUrl = `/watch?v=${video_id}&t=${time}`;
-                              }
-                              if (redirectUrl.includes("http")) {
-                                // go to external link
-                                // create a link element
-                                const linkElement = document.createElement("a");
-                                // set link's href to the path
-                                linkElement.href = redirectUrl;
-                                // set link's target to _blank
-                                linkElement.target = "_blank";
-                                // simulate click on the link
-                                linkElement.click();
-                              } else if (redirectUrl.includes("t=")) {
-                                const time = parseInt(
-                                  redirectUrl.split("t=")[1].split("&")[0]
-                                );
-                                console.log(time);
-                                const player =
-                                  document.getElementById("ytplayer");
-                                player?.setAttribute(
-                                  "src",
-                                  `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
-                                );
-                              } else {
-                                location.href = redirectUrl;
-                              }
-                            }
-                          : () => {}
-                      }
-                      color={item.endpoint ? "blue" : "black"}
-                      style={{ cursor: (item.endpoint && "pointer") || "" }}
-                    >
-                      {item.text}
+                  <Spoiler
+                    maxHeight={50}
+                    showLabel="続きを読む"
+                    hideLabel="閉じる"
+                  >
+                    <Text size="sm" fw={600}>
+                      {videoData.primary_info.view_count.text}・
+                      {videoData.primary_info.published.text}公開
                     </Text>
-                  ))}
-                </Spoiler>
-              </Card>
+                    {(
+                      videoData.secondary_info?.description?.runs ??
+                      ([
+                        {
+                          text: "概要欄は空です",
+                        },
+                      ] as Array<any>)
+                    ).map((item: any) => (
+                      <Text
+                        onClick={
+                          item.endpoint?.metadata?.url
+                            ? () => {
+                                let redirectUrl = item.endpoint?.metadata?.url;
 
-              <Divider />
-              <Accordion>
-                <Accordion.Item value="コメント">
-                  <Accordion.Control>
-                    <Group>
-                      <Text size="xl" fw={700} mt={"sm"}>
-                        {commentsByNewest.length}件のコメント
-                      </Text>
-
-                      <Switch
-                        label="新しい順"
-                        onChange={() => {
-                          setSortByNewest(!sortByNewest);
+                                if (
+                                  redirectUrl.includes(
+                                    "youtube.com/redirect"
+                                  ) &&
+                                  redirectUrl.includes("q=")
+                                ) {
+                                  redirectUrl = decodeURIComponent(
+                                    redirectUrl.split("q=")[1].split("&")[0]
+                                  );
+                                  console.log(redirectUrl);
+                                } else if (redirectUrl.includes("/watch")) {
+                                  const video_id = redirectUrl
+                                    .split("v=")[1]
+                                    .split("&")[0];
+                                  const time = redirectUrl.includes("t=")
+                                    ? redirectUrl.split("t=")[1].split("&")[0]
+                                    : "0";
+                                  redirectUrl = `/watch?v=${video_id}&t=${time}`;
+                                }
+                                if (redirectUrl.includes("http")) {
+                                  // go to external link
+                                  // create a link element
+                                  const linkElement =
+                                    document.createElement("a");
+                                  // set link's href to the path
+                                  linkElement.href = redirectUrl;
+                                  // set link's target to _blank
+                                  linkElement.target = "_blank";
+                                  // simulate click on the link
+                                  linkElement.click();
+                                } else if (redirectUrl.includes("t=")) {
+                                  const time = parseInt(
+                                    redirectUrl.split("t=")[1].split("&")[0]
+                                  );
+                                  console.log(time);
+                                  const player =
+                                    document.getElementById("ytplayer");
+                                  player?.setAttribute(
+                                    "src",
+                                    `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
+                                  );
+                                } else {
+                                  location.href = redirectUrl;
+                                }
+                              }
+                            : () => {}
+                        }
+                        color={item.endpoint ? "blue" : "black"}
+                        style={{
+                          cursor: (item.endpoint && "pointer") || "",
                         }}
-                        style={{ float: "right" }}
-                        ml={"auto"}
-                      />
-                    </Group>
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    {!sortByNewest
-                      ? commentsByRelevance.map((item: any) => (
-                          <Card w={"100%"} key={item.comment.comment_id}>
-                            <Group>
-                              <Avatar
-                                src={item.comment.author.thumbnails[0].url}
-                                size="md"
-                                style={{ verticalAlign: "bottom" }}
-                              />
-                              <Text size="sm" color="gray">
-                                {item.comment.author.name}
-                              </Text>
-                              <Text size="xs" color="gray">
-                                {item.comment.published.text}
-                              </Text>
-                            </Group>
-                            <Spoiler
-                              maxHeight={50}
-                              showLabel="更に表示"
-                              hideLabel="閉じる"
-                              key={shortuuid.generate()}
-                            >
-                              {item.comment.content?.runs?.map(
-                                (comment: any) => (
-                                  <>
-                                    <Text
-                                      onClick={
-                                        comment.endpoint?.metadata?.url
-                                          ? () => {
-                                              let redirectUrl =
-                                                comment.endpoint?.metadata?.url;
+                        key={shortuuid.generate()}
+                      >
+                        {item.text}
+                      </Text>
+                    ))}
+                  </Spoiler>
+                </Card>
+              </Card>
+              <Group>
+                <Text size="xl" fw={700} mt={"sm"}>
+                  {commentsByNewest?.length}件のコメント
+                </Text>
 
-                                              if (
-                                                redirectUrl.includes(
-                                                  "youtube.com/redirect"
-                                                ) &&
-                                                redirectUrl.includes("q=")
-                                              ) {
-                                                redirectUrl =
-                                                  decodeURIComponent(
-                                                    redirectUrl
-                                                      .split("q=")[1]
-                                                      .split("&")[0]
-                                                  );
-                                                console.log(redirectUrl);
-                                              } else if (
-                                                redirectUrl.includes("/watch")
-                                              ) {
-                                                const video_id = redirectUrl
-                                                  .split("v=")[1]
-                                                  .split("&")[0];
-                                                const time =
-                                                  redirectUrl.includes("t=")
-                                                    ? redirectUrl
-                                                        .split("t=")[1]
-                                                        .split("&")[0]
-                                                    : "0";
-                                                redirectUrl = `/watch?v=${video_id}&t=${time}`;
-                                              }
-                                              if (
-                                                redirectUrl.includes("http")
-                                              ) {
-                                                // go to external link
-                                                // create a link element
-                                                const linkElement =
-                                                  document.createElement("a");
-                                                // set link's href to the path
-                                                linkElement.href = redirectUrl;
-                                                // set link's target to _blank
-                                                linkElement.target = "_blank";
-                                                // simulate click on the link
-                                                linkElement.click();
-                                              } else if (
-                                                redirectUrl.includes("t=")
-                                              ) {
-                                                const time = parseInt(
-                                                  redirectUrl
-                                                    .split("t=")[1]
-                                                    .split("&")[0]
-                                                );
-                                                console.log(time);
-                                                const player =
-                                                  document.getElementById(
-                                                    "ytplayer"
-                                                  );
-                                                player?.setAttribute(
-                                                  "src",
-                                                  `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
-                                                );
-                                              } else {
-                                                location.href = redirectUrl;
-                                              }
-                                            }
-                                          : () => {}
-                                      }
-                                      color={
-                                        comment.endpoint ? "blue" : "black"
-                                      }
-                                      style={{
-                                        cursor:
-                                          (comment.endpoint && "pointer") || "",
-                                      }}
-                                      key={shortuuid.generate()}
-                                    >
-                                      {comment.text}
-                                    </Text>
-                                  </>
-                                )
-                              )}
-                            </Spoiler>
-                            <Group key={shortuuid.generate()}>
-                              <FiThumbsUp
-                                style={{ verticalAlign: "bottom" }}
-                                color="gray"
-                              />
-                              <Text size="sm" color="gray">
-                                {item.comment.vote_count}
-                              </Text>
-                            </Group>
-                          </Card>
-                        ))
-                      : commentsByNewest.map((item: any) => (
-                          <Card w={"100%"} key={item.comment.comment_id}>
-                            <Group>
-                              <Avatar
-                                src={item.comment.author.thumbnails[0].url}
-                                size="md"
-                                style={{ verticalAlign: "bottom" }}
-                              />
-                              <Text size="sm" color="gray">
-                                {item.comment.author.name}
-                              </Text>
-                              <Text size="xs" color="gray">
-                                {item.comment.published.text}
-                              </Text>
-                            </Group>
-                            <Spoiler
-                              maxHeight={50}
-                              showLabel="更に表示"
-                              hideLabel="閉じる"
-                            >
-                              {item.comment.content?.runs?.map(
-                                (comment: any) => (
-                                  <>
-                                    <Text
-                                      onClick={
-                                        comment.endpoint?.metadata?.url
-                                          ? () => {
-                                              let redirectUrl =
-                                                comment.endpoint?.metadata?.url;
+                <Switch
+                  label="新しい順"
+                  onChange={() => {
+                    setSortByNewest(!sortByNewest);
+                  }}
+                  style={{ float: "right" }}
+                  ml={"auto"}
+                />
+              </Group>
+              <Divider />
+              {!sortByNewest
+                ? commentsByRelevance?.map((item: any) => (
+                    <Card w={"100%"} key={item.comment.comment_id}>
+                      <Group>
+                        <Avatar
+                          src={item.comment.author.thumbnails[0].url}
+                          size="md"
+                          style={{ verticalAlign: "bottom" }}
+                        />
+                        <Text size="sm" color="gray">
+                          {item.comment.author.name}
+                        </Text>
+                        <Text size="xs" color="gray">
+                          {item.comment.published.text}
+                        </Text>
+                      </Group>
+                      <Spoiler
+                        maxHeight={50}
+                        showLabel="更に表示"
+                        hideLabel="閉じる"
+                      >
+                        {item.comment.content?.runs?.map((comment: any) => (
+                          <>
+                            <Text
+                              onClick={
+                                comment.endpoint?.metadata?.url
+                                  ? () => {
+                                      let redirectUrl =
+                                        comment.endpoint?.metadata?.url;
 
-                                              if (
-                                                redirectUrl.includes(
-                                                  "youtube.com/redirect"
-                                                ) &&
-                                                redirectUrl.includes("q=")
-                                              ) {
-                                                redirectUrl =
-                                                  decodeURIComponent(
-                                                    redirectUrl
-                                                      .split("q=")[1]
-                                                      .split("&")[0]
-                                                  );
-                                                console.log(redirectUrl);
-                                              } else if (
-                                                redirectUrl.includes("/watch")
-                                              ) {
-                                                const video_id = redirectUrl
-                                                  .split("v=")[1]
-                                                  .split("&")[0];
-                                                const time =
-                                                  redirectUrl.includes("t=")
-                                                    ? redirectUrl
-                                                        .split("t=")[1]
-                                                        .split("&")[0]
-                                                    : "0";
-                                                redirectUrl = `/watch?v=${video_id}&t=${time}`;
-                                              }
-                                              if (
-                                                redirectUrl.includes("http")
-                                              ) {
-                                                // go to external link
-                                                // create a link element
-                                                const linkElement =
-                                                  document.createElement("a");
-                                                // set link's href to the path
-                                                linkElement.href = redirectUrl;
-                                                // set link's target to _blank
-                                                linkElement.target = "_blank";
-                                                // simulate click on the link
-                                                linkElement.click();
-                                              } else if (
-                                                redirectUrl.includes("t=")
-                                              ) {
-                                                const time = parseInt(
-                                                  redirectUrl
-                                                    .split("t=")[1]
-                                                    .split("&")[0]
-                                                );
-                                                console.log(time);
-                                                const player =
-                                                  document.getElementById(
-                                                    "ytplayer"
-                                                  );
-                                                player?.setAttribute(
-                                                  "src",
-                                                  `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
-                                                );
-                                              } else {
-                                                location.href = redirectUrl;
-                                              }
-                                            }
-                                          : () => {}
+                                      if (
+                                        redirectUrl.includes(
+                                          "youtube.com/redirect"
+                                        ) &&
+                                        redirectUrl.includes("q=")
+                                      ) {
+                                        redirectUrl = decodeURIComponent(
+                                          redirectUrl
+                                            .split("q=")[1]
+                                            .split("&")[0]
+                                        );
+                                        console.log(redirectUrl);
+                                      } else if (
+                                        redirectUrl.includes("/watch")
+                                      ) {
+                                        const video_id = redirectUrl
+                                          .split("v=")[1]
+                                          .split("&")[0];
+                                        const time = redirectUrl.includes("t=")
+                                          ? redirectUrl
+                                              .split("t=")[1]
+                                              .split("&")[0]
+                                          : "0";
+                                        redirectUrl = `/watch?v=${video_id}&t=${time}`;
                                       }
-                                      color={
-                                        comment.endpoint ? "blue" : "black"
+                                      if (redirectUrl.includes("http")) {
+                                        // go to external link
+                                        // create a link element
+                                        const linkElement =
+                                          document.createElement("a");
+                                        // set link's href to the path
+                                        linkElement.href = redirectUrl;
+                                        // set link's target to _blank
+                                        linkElement.target = "_blank";
+                                        // simulate click on the link
+                                        linkElement.click();
+                                      } else if (redirectUrl.includes("t=")) {
+                                        const time = parseInt(
+                                          redirectUrl
+                                            .split("t=")[1]
+                                            .split("&")[0]
+                                        );
+                                        console.log(time);
+                                        const player =
+                                          document.getElementById("ytplayer");
+                                        player?.setAttribute(
+                                          "src",
+                                          `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
+                                        );
+                                      } else {
+                                        location.href = redirectUrl;
                                       }
-                                      style={{
-                                        cursor:
-                                          (comment.endpoint && "pointer") || "",
-                                      }}
-                                    >
-                                      {comment.text}
-                                    </Text>
-                                  </>
-                                )
-                              )}
-                            </Spoiler>
-                            <Group>
-                              <FiThumbsUp
-                                style={{ verticalAlign: "bottom" }}
-                                color="gray"
-                              />
-                              <Text size="sm" color="gray">
-                                {item.comment.vote_count}
-                              </Text>
-                            </Group>
-                          </Card>
+                                    }
+                                  : () => {}
+                              }
+                              color={comment.endpoint ? "blue" : "black"}
+                              style={{
+                                cursor: (comment.endpoint && "pointer") || "",
+                              }}
+                            >
+                              {comment.text}
+                            </Text>
+                          </>
                         ))}
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
+                      </Spoiler>
+                      <Group>
+                        <FiThumbsUp
+                          style={{ verticalAlign: "bottom" }}
+                          color="gray"
+                        />
+                        <Text size="sm" color="gray">
+                          {item.comment.vote_count}
+                        </Text>
+                      </Group>
+                    </Card>
+                  ))
+                : commentsByNewest?.map((item: any) => (
+                    <Card w={"100%"} key={item.comment.comment_id}>
+                      <Group>
+                        <Avatar
+                          src={item.comment.author.thumbnails[0].url}
+                          size="md"
+                          style={{ verticalAlign: "bottom" }}
+                        />
+                        <Text size="sm" color="gray">
+                          {item.comment.author.name}
+                        </Text>
+                        <Text size="xs" color="gray">
+                          {item.comment.published.text}
+                        </Text>
+                      </Group>
+                      <Spoiler
+                        maxHeight={50}
+                        showLabel="更に表示"
+                        hideLabel="閉じる"
+                      >
+                        {item.comment.content?.runs?.map((comment: any) => (
+                          <>
+                            <Text
+                              onClick={
+                                comment.endpoint?.metadata?.url
+                                  ? () => {
+                                      let redirectUrl =
+                                        comment.endpoint?.metadata?.url;
+
+                                      if (
+                                        redirectUrl.includes(
+                                          "youtube.com/redirect"
+                                        ) &&
+                                        redirectUrl.includes("q=")
+                                      ) {
+                                        redirectUrl = decodeURIComponent(
+                                          redirectUrl
+                                            .split("q=")[1]
+                                            .split("&")[0]
+                                        );
+                                        console.log(redirectUrl);
+                                      } else if (
+                                        redirectUrl.includes("/watch")
+                                      ) {
+                                        const video_id = redirectUrl
+                                          .split("v=")[1]
+                                          .split("&")[0];
+                                        const time = redirectUrl.includes("t=")
+                                          ? redirectUrl
+                                              .split("t=")[1]
+                                              .split("&")[0]
+                                          : "0";
+                                        redirectUrl = `/watch?v=${video_id}&t=${time}`;
+                                      }
+                                      if (redirectUrl.includes("http")) {
+                                        // go to external link
+                                        // create a link element
+                                        const linkElement =
+                                          document.createElement("a");
+                                        // set link's href to the path
+                                        linkElement.href = redirectUrl;
+                                        // set link's target to _blank
+                                        linkElement.target = "_blank";
+                                        // simulate click on the link
+                                        linkElement.click();
+                                      } else if (redirectUrl.includes("t=")) {
+                                        const time = parseInt(
+                                          redirectUrl
+                                            .split("t=")[1]
+                                            .split("&")[0]
+                                        );
+                                        console.log(time);
+                                        const player =
+                                          document.getElementById("ytplayer");
+                                        player?.setAttribute(
+                                          "src",
+                                          `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
+                                        );
+                                      } else {
+                                        location.href = redirectUrl;
+                                      }
+                                    }
+                                  : () => {}
+                              }
+                              color={comment.endpoint ? "blue" : "black"}
+                              style={{
+                                cursor: (comment.endpoint && "pointer") || "",
+                              }}
+                            >
+                              {comment.text}
+                            </Text>
+                          </>
+                        ))}
+                      </Spoiler>
+                      <Group>
+                        <FiThumbsUp
+                          style={{ verticalAlign: "bottom" }}
+                          color="gray"
+                        />
+                        <Text size="sm" color="gray">
+                          {item.comment.vote_count}
+                        </Text>
+                      </Group>
+                    </Card>
+                  ))}
             </>
           )}
-
-          <Divider />
+        </Grid.Col>
+        <Grid.Col span={4}>
           {videoData.watch_next_feed?.map((item: any) => (
             <Card
               p={"sm"}
@@ -1027,15 +558,15 @@ export default function Video() {
                   />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                  <Text size="xl" fw={600} lineClamp={4}>
+                  <Text size="md" fw={600} lineClamp={2}>
                     {item.title?.text}
                   </Text>
                   <Group>
                     <Stack gap={"0"} mr={"auto"}>
-                      <Text size="md" color="gray" lineClamp={1}>
+                      <Text size="xs" color="gray" lineClamp={1}>
                         {item.author?.name}
                       </Text>
-                      <Text size="md" color="gray" lineClamp={1}>
+                      <Text size="xs" color="gray" lineClamp={1}>
                         {item.short_view_count?.text}
                       </Text>
                     </Stack>
@@ -1044,7 +575,469 @@ export default function Video() {
               </Grid>
             </Card>
           ))}
-        </Container>
+        </Grid.Col>
+      </Grid>
+    ) : (
+      <Container w={"90%"} m={"auto"} mt={"lg"}>
+        {videoData.secondary_info && (
+          <>
+            <Card>
+              <Card.Section>
+                <iframe
+                  id="ytplayer"
+                  width="100%"
+                  height="400px"
+                  src={`https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1`}
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              </Card.Section>
+              <Text size="xl" fw={700} mt={"sm"}>
+                {videoData.primary_info?.title.text}
+              </Text>
+              <Group>
+                <Avatar
+                  src={videoData.secondary_info.owner.author.thumbnails[0].url}
+                  size="md"
+                  style={{ verticalAlign: "bottom" }}
+                />
+                <Stack gap={"0"} mr={"auto"}>
+                  <Text size="md">
+                    {videoData.secondary_info.owner.author.name}
+                  </Text>
+                  <Text size="xs" color="gray">
+                    {videoData.secondary_info.owner.subscriber_count.text}
+                  </Text>
+                </Stack>
+                <Badge color="#ececec" h={"30px"}>
+                  <Group>
+                    <FiThumbsUp
+                      style={{ verticalAlign: "middle" }}
+                      size={"20px"}
+                      color="black"
+                      mr="8px"
+                    />
+                    <Text size="xl" color="black">
+                      {
+                        videoData.primary_info?.menu?.top_level_buttons[0]
+                          .like_button.short_like_count
+                      }
+                    </Text>
+                  </Group>
+                </Badge>
+                <Stack gap={"0"}>
+                  <Text size="xs" color="gray" mb={0}>
+                    ダウンロード
+                  </Text>
+                  <Group mb={0} mt={0}>
+                    <ActionIcon
+                      onClick={() => {
+                        const url = downloadLink;
+                        const linkElement = document.createElement("a");
+                        linkElement.href = url;
+                        linkElement.target = "_blank";
+                        linkElement.download = `${video_id}.mp4`;
+                        linkElement.click();
+                      }}
+                      disabled
+                    >
+                      <FiVideo />
+                    </ActionIcon>
+                    <ActionIcon
+                      onClick={() => {
+                        const url = audioLink;
+                        const linkElement = document.createElement("a");
+                        linkElement.href = url;
+                        linkElement.target = "_blank";
+                        linkElement.download = `${video_id}.mp4`;
+                        linkElement.click();
+                      }}
+                      disabled
+                    >
+                      <FiMusic />
+                    </ActionIcon>
+                  </Group>
+                </Stack>
+              </Group>
+              <Spoiler maxHeight={50} showLabel="続きを読む" hideLabel="閉じる">
+                <Text size="sm" fw={600}>
+                  {videoData.primary_info.view_count.text}・
+                  {videoData.primary_info.published.text}公開
+                </Text>
+                {(
+                  videoData.secondary_info?.description?.runs ??
+                  ([
+                    {
+                      text: "概要欄は空です",
+                    },
+                  ] as Array<any>)
+                ).map((item: any) => (
+                  <Text
+                    key={shortuuid.generate()}
+                    onClick={
+                      item.endpoint?.metadata?.url
+                        ? () => {
+                            let redirectUrl = item.endpoint?.metadata?.url;
+
+                            if (
+                              redirectUrl.includes("youtube.com/redirect") &&
+                              redirectUrl.includes("q=")
+                            ) {
+                              redirectUrl = decodeURIComponent(
+                                redirectUrl.split("q=")[1].split("&")[0]
+                              );
+                              console.log(redirectUrl);
+                            } else if (redirectUrl.includes("/watch")) {
+                              const video_id = redirectUrl
+                                .split("v=")[1]
+                                .split("&")[0];
+                              const time = redirectUrl.includes("t=")
+                                ? redirectUrl.split("t=")[1].split("&")[0]
+                                : "0";
+                              redirectUrl = `/watch?v=${video_id}&t=${time}`;
+                            }
+                            if (redirectUrl.includes("http")) {
+                              // go to external link
+                              // create a link element
+                              const linkElement = document.createElement("a");
+                              // set link's href to the path
+                              linkElement.href = redirectUrl;
+                              // set link's target to _blank
+                              linkElement.target = "_blank";
+                              // simulate click on the link
+                              linkElement.click();
+                            } else if (redirectUrl.includes("t=")) {
+                              const time = parseInt(
+                                redirectUrl.split("t=")[1].split("&")[0]
+                              );
+                              console.log(time);
+                              const player =
+                                document.getElementById("ytplayer");
+                              player?.setAttribute(
+                                "src",
+                                `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
+                              );
+                            } else {
+                              location.href = redirectUrl;
+                            }
+                          }
+                        : () => {}
+                    }
+                    color={item.endpoint ? "blue" : "black"}
+                    style={{ cursor: (item.endpoint && "pointer") || "" }}
+                  >
+                    {item.text}
+                  </Text>
+                ))}
+              </Spoiler>
+            </Card>
+
+            <Divider />
+            <Accordion>
+              <Accordion.Item value="コメント">
+                <Accordion.Control>
+                  <Group>
+                    <Text size="xl" fw={700} mt={"sm"}>
+                      {commentsByNewest?.length}件のコメント
+                    </Text>
+
+                    <Switch
+                      label="新しい順"
+                      onChange={() => {
+                        setSortByNewest(!sortByNewest);
+                      }}
+                      style={{ float: "right" }}
+                      ml={"auto"}
+                    />
+                  </Group>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  {!sortByNewest
+                    ? commentsByRelevance?.map((item: any) => (
+                        <Card w={"100%"} key={item.comment.comment_id}>
+                          <Group>
+                            <Avatar
+                              src={item.comment.author.thumbnails[0].url}
+                              size="md"
+                              style={{ verticalAlign: "bottom" }}
+                            />
+                            <Text size="sm" color="gray">
+                              {item.comment.author.name}
+                            </Text>
+                            <Text size="xs" color="gray">
+                              {item.comment.published.text}
+                            </Text>
+                          </Group>
+                          <Spoiler
+                            maxHeight={50}
+                            showLabel="更に表示"
+                            hideLabel="閉じる"
+                            key={shortuuid.generate()}
+                          >
+                            {item?.comment?.content?.runs?.map(
+                              (comment: any) => (
+                                <>
+                                  <Text
+                                    onClick={
+                                      comment.endpoint?.metadata?.url
+                                        ? () => {
+                                            let redirectUrl =
+                                              comment.endpoint?.metadata?.url;
+
+                                            if (
+                                              redirectUrl.includes(
+                                                "youtube.com/redirect"
+                                              ) &&
+                                              redirectUrl.includes("q=")
+                                            ) {
+                                              redirectUrl = decodeURIComponent(
+                                                redirectUrl
+                                                  .split("q=")[1]
+                                                  .split("&")[0]
+                                              );
+                                              console.log(redirectUrl);
+                                            } else if (
+                                              redirectUrl.includes("/watch")
+                                            ) {
+                                              const video_id = redirectUrl
+                                                .split("v=")[1]
+                                                .split("&")[0];
+                                              const time = redirectUrl.includes(
+                                                "t="
+                                              )
+                                                ? redirectUrl
+                                                    .split("t=")[1]
+                                                    .split("&")[0]
+                                                : "0";
+                                              redirectUrl = `/watch?v=${video_id}&t=${time}`;
+                                            }
+                                            if (redirectUrl.includes("http")) {
+                                              // go to external link
+                                              // create a link element
+                                              const linkElement =
+                                                document.createElement("a");
+                                              // set link's href to the path
+                                              linkElement.href = redirectUrl;
+                                              // set link's target to _blank
+                                              linkElement.target = "_blank";
+                                              // simulate click on the link
+                                              linkElement.click();
+                                            } else if (
+                                              redirectUrl.includes("t=")
+                                            ) {
+                                              const time = parseInt(
+                                                redirectUrl
+                                                  .split("t=")[1]
+                                                  .split("&")[0]
+                                              );
+                                              console.log(time);
+                                              const player =
+                                                document.getElementById(
+                                                  "ytplayer"
+                                                );
+                                              player?.setAttribute(
+                                                "src",
+                                                `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
+                                              );
+                                            } else {
+                                              location.href = redirectUrl;
+                                            }
+                                          }
+                                        : () => {}
+                                    }
+                                    color={comment.endpoint ? "blue" : "black"}
+                                    style={{
+                                      cursor:
+                                        (comment.endpoint && "pointer") || "",
+                                    }}
+                                    key={shortuuid.generate()}
+                                  >
+                                    {comment.text}
+                                  </Text>
+                                </>
+                              )
+                            )}
+                          </Spoiler>
+                          <Group key={shortuuid.generate()}>
+                            <FiThumbsUp
+                              style={{ verticalAlign: "bottom" }}
+                              color="gray"
+                            />
+                            <Text size="sm" color="gray">
+                              {item.comment.vote_count}
+                            </Text>
+                          </Group>
+                        </Card>
+                      ))
+                    : commentsByNewest?.map((item: any) => (
+                        <Card w={"100%"} key={item.comment.comment_id}>
+                          <Group>
+                            <Avatar
+                              src={item.comment.author.thumbnails[0].url}
+                              size="md"
+                              style={{ verticalAlign: "bottom" }}
+                            />
+                            <Text size="sm" color="gray">
+                              {item.comment.author.name}
+                            </Text>
+                            <Text size="xs" color="gray">
+                              {item.comment.published.text}
+                            </Text>
+                          </Group>
+                          <Spoiler
+                            maxHeight={50}
+                            showLabel="更に表示"
+                            hideLabel="閉じる"
+                          >
+                            {item.comment.content?.runs?.map((comment: any) => (
+                              <>
+                                <Text
+                                  onClick={
+                                    comment.endpoint?.metadata?.url
+                                      ? () => {
+                                          let redirectUrl =
+                                            comment.endpoint?.metadata?.url;
+
+                                          if (
+                                            redirectUrl.includes(
+                                              "youtube.com/redirect"
+                                            ) &&
+                                            redirectUrl.includes("q=")
+                                          ) {
+                                            redirectUrl = decodeURIComponent(
+                                              redirectUrl
+                                                .split("q=")[1]
+                                                .split("&")[0]
+                                            );
+                                            console.log(redirectUrl);
+                                          } else if (
+                                            redirectUrl.includes("/watch")
+                                          ) {
+                                            const video_id = redirectUrl
+                                              .split("v=")[1]
+                                              .split("&")[0];
+                                            const time = redirectUrl.includes(
+                                              "t="
+                                            )
+                                              ? redirectUrl
+                                                  .split("t=")[1]
+                                                  .split("&")[0]
+                                              : "0";
+                                            redirectUrl = `/watch?v=${video_id}&t=${time}`;
+                                          }
+                                          if (redirectUrl.includes("http")) {
+                                            // go to external link
+                                            // create a link element
+                                            const linkElement =
+                                              document.createElement("a");
+                                            // set link's href to the path
+                                            linkElement.href = redirectUrl;
+                                            // set link's target to _blank
+                                            linkElement.target = "_blank";
+                                            // simulate click on the link
+                                            linkElement.click();
+                                          } else if (
+                                            redirectUrl.includes("t=")
+                                          ) {
+                                            const time = parseInt(
+                                              redirectUrl
+                                                .split("t=")[1]
+                                                .split("&")[0]
+                                            );
+                                            console.log(time);
+                                            const player =
+                                              document.getElementById(
+                                                "ytplayer"
+                                              );
+                                            player?.setAttribute(
+                                              "src",
+                                              `https://www.youtube-nocookie.com/embed/${video_id}?autoplay=1&start=${time}`
+                                            );
+                                          } else {
+                                            location.href = redirectUrl;
+                                          }
+                                        }
+                                      : () => {}
+                                  }
+                                  color={comment.endpoint ? "blue" : "black"}
+                                  style={{
+                                    cursor:
+                                      (comment.endpoint && "pointer") || "",
+                                  }}
+                                >
+                                  {comment.text}
+                                </Text>
+                              </>
+                            ))}
+                          </Spoiler>
+                          <Group>
+                            <FiThumbsUp
+                              style={{ verticalAlign: "bottom" }}
+                              color="gray"
+                            />
+                            <Text size="sm" color="gray">
+                              {item.comment.vote_count}
+                            </Text>
+                          </Group>
+                        </Card>
+                      ))}
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
+          </>
+        )}
+
+        <Divider />
+        {videoData.watch_next_feed?.map((item: any) => (
+          <Card
+            p={"sm"}
+            radius={"sm"}
+            w={"100%"}
+            key={item.id}
+            onClick={() => {
+              location.href = `/watch?v=${item.id}`;
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <Grid>
+              <Grid.Col span={6}>
+                <Image
+                  src={item.thumbnails[0]?.url}
+                  width={"100%"}
+                  radius={"lg"}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Text size="xl" fw={600} lineClamp={4}>
+                  {item.title?.text}
+                </Text>
+                <Group>
+                  <Stack gap={"0"} mr={"auto"}>
+                    <Text size="md" color="gray" lineClamp={1}>
+                      {item.author?.name}
+                    </Text>
+                    <Text size="md" color="gray" lineClamp={1}>
+                      {item.short_view_count?.text}
+                    </Text>
+                  </Stack>
+                </Group>
+              </Grid.Col>
+            </Grid>
+          </Card>
+        ))}
+      </Container>
+    );
+  }
+
+  return (
+    <div>
+      <Header />
+      {loading ? (
+        <Center>
+          <Loader color="pink" />
+        </Center>
+      ) : (
+        <VideoCard />
       )}
     </div>
   );

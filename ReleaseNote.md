@@ -11,3 +11,7 @@ Initial release
 
 ## 1.1.1
 - Add: PWA Support
+
+## 1.1.2
+- Fix: Backend API endpoint
+- Add: Loading indicator

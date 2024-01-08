@@ -11,9 +11,11 @@ import {
   Overlay,
   Center,
 } from "@mantine/core";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Innertube, UniversalCache } from "youtubei.js/web";
 export default function Home() {
+  const router = useRouter();
   const [results, setResults] = useState(Array);
   const [query, setQuery] = useState("フリーレン");
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function Home() {
 
         // Transform the url for use with our proxy.
         url.searchParams.set("__host", url.host);
-        url.host = "tubebackend-1-w0058933.deta.app";
+        url.host = "kokohachi.deno.dev";
         url.protocol = "https";
 
         const headers = init?.headers
@@ -101,7 +103,12 @@ export default function Home() {
         radius={"md"}
         h={"350px"}
         key={video.id}
-        onClick={() => (location.href = `/watch?v=${video.id}`)}
+        onClick={
+          //use router to navigate to video page
+          () => {
+            router.push(`/watch?v=${video.id}`);
+          }
+        }
         style={{ cursor: "pointer" }}
       >
         <Card.Section h={"250px"}>
