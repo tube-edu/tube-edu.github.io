@@ -2996,6 +2996,11 @@ jsonpointer@^5.0.0:
     object.assign "^4.1.4"
     object.values "^1.1.6"
 
+keymaster@1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/keymaster/-/keymaster-1.6.2.tgz#e1ae54d0ea9488f9f60b66b668f02e9a1946c6eb"
+  integrity sha512-OvA/AALN8IDKKkTk2Z+bDrzs/SQao4lo/QPbwSdDvm+frxfiYiYCSn1aHFUypJY3SruAO1y/c771agBmTXqUtg==
+
 keyv@^4.5.3:
   version "4.5.4"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-4.5.4.tgz#a879a99e29452f942439f2a405e3af8b31d4de93"
@@ -3558,6 +3563,13 @@ react-style-singleton@^2.2.1:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^2.0.0"
+
+react-tetris@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/react-tetris/-/react-tetris-0.4.0.tgz#fb4d209a08b4cadd98737d1fb0b30a9843c02377"
+  integrity sha512-HmQdCsBEY5aCMNJO1x6wAfGfQ1hPZ8idbrXkjfcBxIORx6KWAV/E+jEp7jUhN6rNuss93m9fslCTisZRnvP6xg==
+  dependencies:
+    keymaster "1.6.2"
 
 react-textarea-autosize@8.5.3:
   version "8.5.3"
