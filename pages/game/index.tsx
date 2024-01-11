@@ -1,7 +1,7 @@
 import Header from "@/components/game/Header";
-import Tetris from "react-tetris";
+import Tetris from "@/lib/react-tetris";
 
-export default function Pixiv() {
+export default function Game() {
   return (
     <div>
       <Header />
@@ -31,7 +31,7 @@ export default function Pixiv() {
             linesCleared,
             state,
             controller,
-          }) => (
+          }: any) => (
             <div>
               <HeldPiece />
               <div>
