@@ -191,10 +191,9 @@ export default function Video() {
                         onClick={() => {
                           const linkElement = document.createElement("a");
                           linkElement.href =
-                            videoData?.streaming_data?.formats?.[0]?.url;
+                            videoData?.streaming_data?.formats[0]?.url;
                           linkElement.click();
                         }}
-                        disabled
                       >
                         <FiVideo />
                       </ActionIcon>
@@ -632,13 +631,11 @@ export default function Video() {
                   <Group mb={0} mt={0}>
                     <ActionIcon
                       onClick={() => {
-                        const url = downloadLink;
-                        const linkElement = document.createElement("a");
-                        linkElement.href = url;
-                        linkElement.target = "_blank";
-                        linkElement.download = `${video_id}.mp4`;
-                        linkElement.click();
-                      }}
+                          const linkElement = document.createElement("a");
+                          linkElement.href =
+                            videoData?.streaming_data?.formats[0]?.url;
+                          linkElement.click();
+                        }}
                       disabled
                     >
                       <FiVideo />
