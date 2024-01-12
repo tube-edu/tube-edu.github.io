@@ -630,7 +630,8 @@ export default function Video() {
                   </Text>
                   <Group mb={0} mt={0}>
                     <ActionIcon
-                      onClick={() => {
+                        onClick={() => {
+                          console.log(JSON.stringify(videoData))
                           const linkElement = document.createElement("a");
                           linkElement.href =
                             videoData?.streaming_data?.formats[0]?.url;
