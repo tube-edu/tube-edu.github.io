@@ -190,8 +190,14 @@ export default function Video() {
                       <ActionIcon
                         onClick={() => {
                           const linkElement = document.createElement("a");
-                          linkElement.href =
-                            videoData?.streaming_data?.formats[0]?.url;
+                          // sort by video height
+                          const ListByQuality = videoData?.streaming_data?.formats?.sort(
+                            (a: any, b: any) => {
+                              return (
+                                parseInt(b.height) - parseInt(a.height)
+                              );
+                            });
+                            linkElement.href = ListByQuality[0]?.url;
                           linkElement.click();
                         }}
                       >
@@ -631,13 +637,17 @@ export default function Video() {
                   <Group mb={0} mt={0}>
                     <ActionIcon
                         onClick={() => {
-                          console.log(JSON.stringify(videoData))
                           const linkElement = document.createElement("a");
-                          linkElement.href =
-                            videoData?.streaming_data?.formats[0]?.url;
+                          // sort by video height
+                          const ListByQuality = videoData?.streaming_data?.formats?.sort(
+                            (a: any, b: any) => {
+                              return (
+                                parseInt(b.height) - parseInt(a.height)
+                              );
+                            });
+                          linkElement.href = ListByQuality[0]?.url;
                           linkElement.click();
                         }}
-                      disabled
                     >
                       <FiVideo />
                     </ActionIcon>
