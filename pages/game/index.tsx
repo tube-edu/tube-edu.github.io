@@ -1,6 +1,6 @@
 import Header from "@/components/game/Header";
 import { SimpleGrid } from "@mantine/core";
-import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
+import { Card, Image, Text, Badge, Button, Group, Anchor } from '@mantine/core';
 import { useRouter } from 'next/router';
 
 export default function Game() {
@@ -23,7 +23,7 @@ export default function Game() {
 
             <Text fw={500}>坊主がクレーン車で除夜の鐘を叩くゲーム</Text>
           </Group>
-
+          <Anchor href={"https://unityroom.com/games/bozucrane"} target="_blank" size="sm" mb={"5px"}>by ニカイドウレンジ - Unityroom</Anchor>
           <Text size="sm" c="dimmed">
             二重振り子を題材にしたシンプルな物理演算ゲームです。
           </Text>

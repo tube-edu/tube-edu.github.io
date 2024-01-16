@@ -120,7 +120,7 @@ export default function Header(props: any) {
             The Games
           </Text>
           <Text fw="light">|</Text>
-          <PiYoutubeLogoDuotone  onClick={() => {router.push("")}} size={24} color={"red"}/>
+          <PiYoutubeLogoDuotone  onClick={() => {router.push("/")}} size={24} color={"red"}/>
           </Group>
         </Grid.Col>
         <Grid.Col span={8}>
