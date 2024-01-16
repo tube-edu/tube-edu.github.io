@@ -9,10 +9,13 @@ import {
   Group,
   Loader,
   Overlay,
+  Alert,
   Center,
+  Anchor,
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { MdNewReleases } from "react-icons/md";
 import { Innertube, UniversalCache } from "youtubei.js/web";
 export default function Home() {
   const router = useRouter();
@@ -30,8 +33,8 @@ export default function Home() {
           typeof input === "string"
             ? new URL(input)
             : input instanceof URL
-            ? input
-            : new URL(input.url);
+              ? input
+              : new URL(input.url);
 
         // Transform the url for use with our proxy.
         url.searchParams.set("__host", url.host);
@@ -41,8 +44,8 @@ export default function Home() {
         const headers = init?.headers
           ? new Headers(init.headers)
           : input instanceof Request
-          ? input.headers
-          : new Headers();
+            ? input.headers
+            : new Headers();
 
         // Now serialize the headers.
         // @ts-ignore
@@ -65,12 +68,12 @@ export default function Home() {
           request,
           init
             ? {
-                ...init,
-                headers,
-              }
+              ...init,
+              headers,
+            }
             : {
-                headers,
-              }
+              headers,
+            }
         );
         // failed to fetch
 
@@ -141,7 +144,11 @@ export default function Home() {
     <div>
       <Header setQuery={setQuery} query={query} />
       <Space h={"lg"} />
-
+      <Alert title="ゲームが新登場！" icon={<MdNewReleases size={32} />} withCloseButton maw={"90%"} mx={"auto"} mb={"5px"} color="orange">
+        新サービス The Games にて「坊主がクレーン車で除夜の鐘を叩くゲーム」配信開始！
+        <br />
+        <Anchor href="/game" target="_blank">今すぐここからプレイ！</Anchor>
+      </Alert>
       {results.length > 0 ? (
         <SimpleGrid
           cols={{ xs: 1, sm: 2, md: 2, lg: 3 }}
@@ -149,6 +156,7 @@ export default function Home() {
           verticalSpacing="lg"
           w={"90%"}
           m={"auto"}
+          mt={"10px"}
         >
           <VideoCardComponent />
         </SimpleGrid>

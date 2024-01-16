@@ -8,6 +8,7 @@ import {
   ActionIcon,
   Avatar,
   Autocomplete,
+  Group
 } from "@mantine/core";
 import { PiYoutubeLogoDuotone } from "react-icons/pi";
 import { Input } from "@mantine/core";
@@ -99,11 +100,12 @@ export default function Header(props: any) {
     >
       <Grid>
         <Grid.Col span={3}>
+          <Group>
           {/*change by viewport size*/}
           <Text
             size="xl"
             fw={700}
-            onClick={() => (location.href = "/")}
+            onClick={() => (location.href = "/game")}
             style={{ cursor: "pointer" }}
           >
             <SiNintendogamecube
@@ -116,6 +118,9 @@ export default function Header(props: any) {
             />
             The Games
           </Text>
+          <Text fw="light">|</Text>
+          <PiYoutubeLogoDuotone  onClick={() => {router.push("/game")}} size={24} color={"red"}/>
+          </Group>
         </Grid.Col>
         <Grid.Col span={8}>
           <Autocomplete
