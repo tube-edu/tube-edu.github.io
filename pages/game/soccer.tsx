@@ -1,6 +1,6 @@
 import Header from "@/components/game/Header";
 
-import { Text, Container, AspectRatio } from '@mantine/core';
+import { Text, Container, AspectRatio, Space } from '@mantine/core';
 
 export default function Game() {
   return (
@@ -11,6 +11,8 @@ export default function Game() {
         <AspectRatio ratio={9 / 16} maw={"500px"} mx="auto">
         <iframe src="https://kokohachi.github.io/pocket_champs" width="100%" frameBorder="0" scrolling="no"></iframe>
         </AspectRatio>
+        <Space h="xl" />
+        <Text>Pocket Championsの開発元はGameSnackです</Text>
       </Container>
     </>
   );
