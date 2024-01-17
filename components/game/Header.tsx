@@ -8,6 +8,7 @@ import {
   ActionIcon,
   Avatar,
   Autocomplete,
+  Group
 } from "@mantine/core";
 import { PiYoutubeLogoDuotone } from "react-icons/pi";
 import { Input } from "@mantine/core";
@@ -15,10 +16,11 @@ import { IoSearchOutline } from "react-icons/io5";
 import { SiNintendogamecube } from "react-icons/si";
 import { useState } from "react";
 import Innertube, { UniversalCache } from "youtubei.js";
-
+import{ useRouter }from "next/router";
 export default function Header(props: any) {
   const [autocompletedata, setAutocompletedata] = useState(Array<string>());
   const [query, setQuery] = useState("");
+  const router = useRouter();
   const handleQueryChange = (query: string) => {
     props.setQuery(query);
   };
@@ -99,11 +101,12 @@ export default function Header(props: any) {
     >
       <Grid>
         <Grid.Col span={3}>
+          <Group>
           {/*change by viewport size*/}
           <Text
             size="xl"
             fw={700}
-            onClick={() => (location.href = "/")}
+            onClick={() => (location.href = "/game")}
             style={{ cursor: "pointer" }}
           >
             <SiNintendogamecube
@@ -116,6 +119,9 @@ export default function Header(props: any) {
             />
             The Games
           </Text>
+          <Text fw="light">|</Text>
+          <PiYoutubeLogoDuotone  onClick={() => {router.push("/")}} size={24} color={"red"}/>
+          </Group>
         </Grid.Col>
         <Grid.Col span={8}>
           <Autocomplete
