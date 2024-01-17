@@ -28,7 +28,7 @@ export default function Ocfl() {
             元サイト
           </Anchor>
         </Group>
-        <AspectRatio ratio={9 / 16} maw={"500px"} mx="auto">
+        <AspectRatio ratio={16/9} mx="auto">
           <iframe
             src="https://kokohachi.github.io/bozu/ocfl"
             width="100%"
