@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-
 export default function Maintanance() {
   return (
     <div>
