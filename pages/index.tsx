@@ -145,7 +145,9 @@ export default function Home() {
       <Header setQuery={setQuery} query={query} />
       <Space h={"lg"} />
       <Alert title="ゲームが新登場！" icon={<MdNewReleases size={32} />} withCloseButton maw={"90%"} mx={"auto"} mb={"5px"} color="orange">
-        新サービス The Games にて「坊主がクレーン車で除夜の鐘を叩くゲーム」配信開始！
+        新サービス The Games にて「シュレディンガーのキャットタワー」等配信開始！
+        <br />
+        開発者はサイト運営者ではありません！
         <br />
         <Anchor href="/game" target="_blank">今すぐここからプレイ！</Anchor>
       </Alert>
