@@ -144,11 +144,6 @@ export default function Home() {
     <div>
       <Header setQuery={setQuery} query={query} />
       <Space h={"lg"} />
-      <Alert title="ゲームが新登場！" icon={<MdNewReleases size={32} />} withCloseButton maw={"90%"} mx={"auto"} mb={"5px"} color="orange">
-        新サービス The Games にて「坊主がクレーン車で除夜の鐘を叩くゲーム」配信開始！
-        <br />
-        <Anchor href="/game" target="_blank">今すぐここからプレイ！</Anchor>
-      </Alert>
       {results.length > 0 ? (
         <SimpleGrid
           cols={{ xs: 1, sm: 2, md: 2, lg: 3 }}
