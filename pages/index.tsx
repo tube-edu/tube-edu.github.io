@@ -20,7 +20,7 @@ import { Innertube, UniversalCache } from "youtubei.js/web";
 export default function Home() {
   const router = useRouter();
   const [results, setResults] = useState(Array);
-  const [query, setQuery] = useState("フリーレン");
+  const [query, setQuery] = useState("ブルアカ");
   const [loading, setLoading] = useState(true);
 
   async function search(query: string) {
@@ -93,8 +93,8 @@ export default function Home() {
   useEffect(() => {
     if (location.search) {
       const params = new URLSearchParams(location.search);
-      setQuery(params.get("q") || "フリーレン");
-      search(params.get("q") || "フレーレン");
+      setQuery(params.get("q") || "ブルアカ");
+      search(params.get("q") || "ブルアカ");
     } else {
       search(query || "おすすめ");
     }
